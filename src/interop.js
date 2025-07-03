@@ -1,9 +1,11 @@
 import { iosSafariPositionSticky } from "./ios-safari-position-sticky";
+import { generateUsername } from "unique-username-generator";
 
 export const flags = ({ env }) => {
   return {
     apiUrl: env.API_URL || "https://cooperative-crosswords-be.fly.dev/",
     teamId: getTeamId(),
+    username: getUsername(),
   };
 };
 
@@ -46,6 +48,16 @@ function randomFourLetters() {
     result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
   }
   return result;
+}
+
+function getUsername() {
+  const storedUsername = localStorage.getItem("username");
+  if (storedUsername) {
+    return storedUsername;
+  }
+  const username = generateUsername("-");
+  localStorage.setItem("username", username);
+  return username;
 }
 
 let ws;

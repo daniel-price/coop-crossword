@@ -18,7 +18,7 @@ page sharedModel _ =
         { init = init
         , update = update
         , subscriptions = subscriptions
-        , view = view sharedModel.teamId
+        , view = view sharedModel
         }
 
 
@@ -72,8 +72,8 @@ subscriptions _ =
 -- VIEW
 
 
-view : String -> Model -> View Msg
-view teamId model =
+view : Shared.Model -> Model -> View Msg
+view sharedModel model =
     { title = "Crosswords"
     , body =
         case model of
@@ -87,10 +87,11 @@ view teamId model =
                 [ text "Failed to load crosswords" ]
 
             Success { crosswordInfos } ->
-                [ div [ id "crosswords" ]
+                [ div [ id "username" ] [ text ("Playing as: " ++ sharedModel.username) ]
+                , div [ id "crosswords" ]
                     (crosswordInfos
                         |> splitBySeries
-                        |> List.map (viewSeries teamId)
+                        |> List.map (viewSeries sharedModel.teamId)
                     )
                 ]
     }

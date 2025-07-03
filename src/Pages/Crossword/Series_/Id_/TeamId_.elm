@@ -27,12 +27,12 @@ import View exposing (View)
 
 
 page : Shared.Model -> Route { series : String, id : String, teamId : String } -> Page Model Msg
-page _ route =
+page sharedModel route =
     Page.new
         { init = init route.params.series route.params.id route.params.teamId
         , update = update
         , subscriptions = subscriptions
-        , view = view
+        , view = view sharedModel
         }
 
 
@@ -531,8 +531,8 @@ keyDownSubscription =
 -- VIEW
 
 
-view : Model -> View Msg
-view model =
+view : Shared.Model -> Model -> View Msg
+view sharedModel model =
     { title = "Crossword"
     , body =
         case model of
@@ -546,12 +546,12 @@ view model =
                 [ text "Failed to load crossword" ]
 
             Success loadedModel ->
-                [ viewCrossword loadedModel ]
+                [ viewCrossword sharedModel loadedModel ]
     }
 
 
-viewCrossword : LoadedModel -> Html Msg
-viewCrossword loadedModel =
+viewCrossword : Shared.Model -> LoadedModel -> Html Msg
+viewCrossword sharedModel loadedModel =
     let
         { crossword, selectedCoordinate, selectedDirection } =
             loadedModel
@@ -573,6 +573,7 @@ viewCrossword loadedModel =
         children : List (Html Msg)
         children =
             []
+                |> Build.add (viewUsername sharedModel.username)
                 |> Build.add (viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel)
                 |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
     in
@@ -600,6 +601,20 @@ viewInfo crossword =
                 |> Build.add (text (Util.String.capitalizeFirstLetter crossword.series ++ " " ++ crossword.seriesNo ++ " - " ++ crossword.date ++ " -" ++ setByString ++ " for "))
                 |> Build.add
                     (a [ href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo) ] [ text "the Guardian" ])
+    in
+    div attributes children
+
+
+viewUsername : String -> Html Msg
+viewUsername username =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ id "username" ]
+
+        children : List (Html Msg)
+        children =
+            [ text ("Playing as: " ++ username) ]
     in
     div attributes children
 

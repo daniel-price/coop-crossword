@@ -8,6 +8,9 @@
     "review": "elm-review --ignore-dirs .elm-land",
     "test": "elm-test"
   },
+  "dependencies": {
+    "unique-username-generator": "^1.4.0"
+  },
   "devDependencies": {
     "@types/bun": "^1.2.3",
     "elm-format": "^0.8.7",

@@ -26,14 +26,16 @@ import Shared.Msg
 type alias Flags =
     { apiUrl : String
     , teamId : String
+    , username : String
     }
 
 
 decoder : Json.Decode.Decoder Flags
 decoder =
-    Json.Decode.map2 Flags
+    Json.Decode.map3 Flags
         (Json.Decode.field "apiUrl" Json.Decode.string)
         (Json.Decode.field "teamId" Json.Decode.string)
+        (Json.Decode.field "username" Json.Decode.string)
 
 
 
@@ -50,6 +52,7 @@ init flagsResult _ =
         Ok flags ->
             ( { apiUrl = flags.apiUrl
               , teamId = flags.teamId
+              , username = flags.username
               }
             , Effect.none
             )
@@ -57,6 +60,7 @@ init flagsResult _ =
         Err _ ->
             ( { apiUrl = "https://cooperative-crosswords-be.fly.dev/"
               , teamId = "team-id"
+              , username = "anonymous"
               }
             , Effect.none
             )

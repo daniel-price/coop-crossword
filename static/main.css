@@ -165,6 +165,13 @@ body {
   font-size: 3em;
 }
 
+#username {
+  text-align: center;
+  font-size: 2em;
+  color: #696969;
+  margin-bottom: 0.5em;
+}
+
 /*Home*/
 #crosswords {
   display: flex;
