@@ -29,7 +29,7 @@ import View exposing (View)
 page : Shared.Model -> Route { series : String, id : String, teamId : String } -> Page Model Msg
 page sharedModel route =
     Page.new
-        { init = init route.params.series route.params.id route.params.teamId
+        { init = init route.params.series route.params.id route.params.teamId sharedModel.username
         , update = update
         , subscriptions = subscriptions
         , view = view sharedModel
@@ -48,6 +48,7 @@ type alias LoadedModel =
     , countdownButtonCheckModel : CountdownButton.Model
     , countdownButtonRevealModel : CountdownButton.Model
     , countdownButtonClearModel : CountdownButton.Model
+    , username : String
     }
 
 
@@ -55,10 +56,10 @@ type alias Model =
     WebData LoadedModel
 
 
-init : String -> String -> String -> () -> ( Model, Effect Msg )
-init series seriesNo teamId () =
+init : String -> String -> String -> String -> () -> ( Model, Effect Msg )
+init series seriesNo teamId username () =
     ( Loading
-    , Crossword.fetch { series = series, id = seriesNo, onResponse = \result -> CrosswordFetched seriesNo teamId result }
+    , Crossword.fetch { series = series, id = seriesNo, onResponse = \result -> CrosswordFetched seriesNo teamId username result }
     )
 
 
@@ -99,14 +100,14 @@ type CrosswordUpdatedMsg
 
 type Msg
     = NoOp
-    | CrosswordFetched String String (WebData Crossword)
+    | CrosswordFetched String String String (WebData Crossword)
     | CrosswordUpdated CrosswordUpdatedMsg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case ( msg, model ) of
-        ( CrosswordFetched id teamId response, Loading ) ->
+        ( CrosswordFetched id teamId username response, Loading ) ->
             let
                 loadedModel : WebData LoadedModel
                 loadedModel =
@@ -141,6 +142,7 @@ update msg model =
                                 , countdownButtonCheckModel = CountdownButton.init
                                 , countdownButtonRevealModel = CountdownButton.init
                                 , countdownButtonClearModel = CountdownButton.init
+                                , username = username
                                 }
                             )
 
@@ -224,7 +226,7 @@ updateCrossword msg loadedModel =
                         |> Dict.insert coordinate letter
                         |> setFilledLetters
                    )
-                |> Effect.set (Effect.sendWebsocketMessage [ ( coordinate, letter ) ])
+                |> Effect.set (Effect.sendWebsocketMessage loadedModel.username [ ( coordinate, letter ) ])
 
         FilledLettersUpdated filledLetters ->
             loadedModel
@@ -238,7 +240,7 @@ updateCrossword msg loadedModel =
                         Just _ ->
                             loadedModel
                                 |> setFilledLetters (Dict.remove loadedModel.selectedCoordinate loadedModel.filledLetters)
-                                |> Effect.set (Effect.sendWebsocketMessage [ ( loadedModel.selectedCoordinate, ' ' ) ])
+                                |> Effect.set (Effect.sendWebsocketMessage loadedModel.username [ ( loadedModel.selectedCoordinate, ' ' ) ])
 
                         Nothing ->
                             loadedModel
@@ -398,7 +400,7 @@ updateCoordinateLetters loadedModel changedLetters =
     in
     loadedModel
         |> setFilledLetters newFilledLetters
-        |> Effect.set (Effect.sendWebsocketMessage changedLetters)
+        |> Effect.set (Effect.sendWebsocketMessage loadedModel.username changedLetters)
 
 
 getIncorrectCoordinates : Grid Cell -> FilledLetters -> List Coordinate -> List Coordinate

@@ -82,9 +82,7 @@ function createWebSocket(app, env, data) {
       return;
     }
 
-    const userId = 1; //TODO
-
-    const url = `${WEBSOCKET_URL}move/${teamId.toUpperCase()}/${crosswordId}/${userId}`;
+    const url = `${WEBSOCKET_URL}move/${teamId.toUpperCase()}/${crosswordId}/${getUsername()}`;
     ws = new WebSocket(url);
 
     ws.addEventListener("message", function (event) {

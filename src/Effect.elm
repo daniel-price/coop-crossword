@@ -241,8 +241,8 @@ setupFocusInputOnClick =
         }
 
 
-sendWebsocketMessage : List ( Coordinate, Char ) -> Effect msg
-sendWebsocketMessage messages =
+sendWebsocketMessage : String -> List ( Coordinate, Char ) -> Effect msg
+sendWebsocketMessage username messages =
     SendMessageToJavaScript
         { tag = "SEND_WEBSOCKET_MESSAGE"
         , data =
@@ -252,6 +252,7 @@ sendWebsocketMessage messages =
                         [ ( "value", Json.Encode.string (String.fromChar value) )
                         , ( "x", Json.Encode.int x )
                         , ( "y", Json.Encode.int y )
+                        , ( "modified_by", Json.Encode.string username )
                         ]
                 )
                 messages
@@ -274,8 +275,8 @@ subscribeToWebsocket : (FilledLetters -> msg) -> msg -> Sub msg
 subscribeToWebsocket successMsg failureMsg =
     messageReceiver
         (\string ->
-            string
-                |> Json.Decode.decodeString
+            case
+                Json.Decode.decodeString
                     (Json.Decode.map Dict.fromList <|
                         Json.Decode.list
                             (Json.Decode.map3
@@ -297,8 +298,13 @@ subscribeToWebsocket successMsg failureMsg =
                                 (Json.Decode.field "value" Json.Decode.string)
                             )
                     )
-                |> Result.map successMsg
-                |> Result.withDefault failureMsg
+                    string
+            of
+                Ok filledLetters ->
+                    successMsg filledLetters
+
+                Err _ ->
+                    failureMsg
         )
 
 
