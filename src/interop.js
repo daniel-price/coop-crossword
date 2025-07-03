@@ -51,7 +51,7 @@ function randomFourLetters() {
 let ws;
 
 function createWebSocket(app, env, data) {
-  const { WEBSOCKET_URL = "wss://cooperative-crosswords-be.fly.dev/" } = env;
+  const { WEBSOCKET_URL } = env;
 
   if (!WEBSOCKET_URL) {
     console.error("Websocket url is required to create websocket");
