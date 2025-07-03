@@ -87,7 +87,7 @@ view sharedModel model =
                 [ text "Failed to load crosswords" ]
 
             Success { crosswordInfos } ->
-                [ div [ id "username" ] [ text ("Playing as: " ++ sharedModel.username) ]
+                [ div [ id "username" ] [ text sharedModel.username ]
                 , div [ id "crosswords" ]
                     (crosswordInfos
                         |> splitBySeries

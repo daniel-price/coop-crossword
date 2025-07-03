@@ -86,6 +86,7 @@ function createWebSocket(app, env, data) {
     ws = new WebSocket(url);
 
     ws.addEventListener("message", function (event) {
+      console.log("Received message from websocket", event.data);
       app.ports.messageReceiver.send(event.data);
     });
     ws.onopen = function () {
@@ -101,6 +102,15 @@ function createWebSocket(app, env, data) {
 }
 
 function sendWebSocketMessage(data) {
+  if (!ws) {
+    console.error("Websocket is not initialized");
+    return;
+  }
+
+  ws.send(JSON.stringify(data));
+}
+
+function sendCursorPositionUpdate(data) {
   if (!ws) {
     console.error("Websocket is not initialized");
     return;

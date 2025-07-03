@@ -45,6 +45,7 @@ type alias LoadedModel =
     , selectedCoordinate : ( Int, Int )
     , selectedDirection : Direction
     , filledLetters : FilledLetters
+    , otherUsersCursorPositions : Dict.Dict String Coordinate
     , countdownButtonCheckModel : CountdownButton.Model
     , countdownButtonRevealModel : CountdownButton.Model
     , countdownButtonClearModel : CountdownButton.Model
@@ -84,6 +85,7 @@ type CrosswordUpdatedMsg
     = CellSelected Coordinate
     | CellLetterAdded Coordinate Char
     | FilledLettersUpdated FilledLetters
+    | CursorPositionUpdated String Coordinate
     | KeyDown Key
     | ClueSelected Clue
     | Check
@@ -139,6 +141,7 @@ update msg model =
                                 , selectedCoordinate = selectedCoordinate
                                 , selectedDirection = selectedDirection
                                 , filledLetters = Dict.empty
+                                , otherUsersCursorPositions = Dict.empty
                                 , countdownButtonCheckModel = CountdownButton.init
                                 , countdownButtonRevealModel = CountdownButton.init
                                 , countdownButtonClearModel = CountdownButton.init
@@ -149,8 +152,17 @@ update msg model =
                 effect : Effect Msg
                 effect =
                     case loadedModel of
-                        Success _ ->
-                            Effect.batch [ Effect.createWebsocket id teamId, Effect.setupFocusInputOnClick ]
+                        Success loadedModelData ->
+                            let
+                                initialCoordinate : Coordinate
+                                initialCoordinate =
+                                    loadedModelData.selectedCoordinate
+                            in
+                            Effect.batch
+                                [ Effect.createWebsocket id teamId
+                                , Effect.setupFocusInputOnClick
+                                , Effect.sendCursorPositionUpdate loadedModelData.username initialCoordinate
+                                ]
 
                         _ ->
                             Effect.none
@@ -214,23 +226,33 @@ updateCrossword msg loadedModel =
         CellSelected coordinate ->
             loadedModel
                 |> updateCellSelected coordinate
-                |> Effect.set Effect.none
+                |> Effect.set (Effect.sendCursorPositionUpdate loadedModel.username coordinate)
 
         CellLetterAdded coordinate letter ->
-            loadedModel
-                |> (loadedModel.crossword
+            let
+                nextCoordinate : Coordinate
+                nextCoordinate =
+                    loadedModel.crossword
                         |> Crossword.getNextClueCoordinate loadedModel.selectedCoordinate loadedModel.selectedDirection
+            in
+            loadedModel
+                |> (nextCoordinate
                         |> setSelectedCoordinate
                    )
                 |> (loadedModel.filledLetters
                         |> Dict.insert coordinate letter
                         |> setFilledLetters
                    )
-                |> Effect.set (Effect.sendWebsocketMessage loadedModel.username [ ( coordinate, letter ) ])
+                |> Effect.set (Effect.batch [ Effect.sendWebsocketMessage loadedModel.username [ ( coordinate, letter ) ], Effect.sendCursorPositionUpdate loadedModel.username nextCoordinate ])
 
         FilledLettersUpdated filledLetters ->
             loadedModel
                 |> setFilledLetters (Dict.union filledLetters loadedModel.filledLetters)
+                |> Effect.set Effect.none
+
+        CursorPositionUpdated username coordinate ->
+            loadedModel
+                |> setOtherUsersCursorPosition username coordinate
                 |> Effect.set Effect.none
 
         KeyDown key ->
@@ -255,9 +277,10 @@ updateCrossword msg loadedModel =
                         |> Effect.set Effect.none
 
                 Arrow arrowDirection ->
-                    loadedModel
-                        |> updateCellSelected
-                            (case arrowDirection of
+                    let
+                        newCoordinate : Coordinate
+                        newCoordinate =
+                            case arrowDirection of
                                 ArrowLeft ->
                                     Crossword.getPreviousWhiteCoordinate loadedModel.selectedCoordinate Across loadedModel.crossword
 
@@ -269,18 +292,23 @@ updateCrossword msg loadedModel =
 
                                 ArrowDown ->
                                     Crossword.getNextWhiteCoordinate loadedModel.selectedCoordinate Down loadedModel.crossword
-                            )
-                        |> Effect.set Effect.none
+                    in
+                    loadedModel
+                        |> updateCellSelected newCoordinate
+                        |> Effect.set (Effect.sendCursorPositionUpdate loadedModel.username newCoordinate)
 
         ClueSelected clue ->
-            loadedModel
-                |> setSelectedCoordinate
-                    (loadedModel.crossword.grid
+            let
+                newCoordinate : Coordinate
+                newCoordinate =
+                    loadedModel.crossword.grid
                         |> Grid.findCoordinate (\cell -> Cell.getNumber cell == Just (Clue.getNumber clue))
                         |> Maybe.withDefault loadedModel.selectedCoordinate
-                    )
+            in
+            loadedModel
+                |> setSelectedCoordinate newCoordinate
                 |> setSelectedDirection (Clue.getDirection clue)
-                |> Effect.set Effect.none
+                |> Effect.set (Effect.sendCursorPositionUpdate loadedModel.username newCoordinate)
 
         Check ->
             loadedModel.crossword
@@ -476,6 +504,11 @@ setFilledLetters filledLetters model =
     { model | filledLetters = filledLetters |> Dict.filter (\_ letter -> letter /= ' ') }
 
 
+setOtherUsersCursorPosition : String -> Coordinate -> LoadedModel -> LoadedModel
+setOtherUsersCursorPosition username coordinate model =
+    { model | otherUsersCursorPositions = Dict.insert username coordinate model.otherUsersCursorPositions }
+
+
 
 -- SUBSCRIPTIONS
 
@@ -487,6 +520,11 @@ subscriptions model =
             (\loadedModel ->
                 Sub.batch
                     [ Effect.subscribeToWebsocket (CrosswordUpdated << FilledLettersUpdated) NoOp
+                    , Effect.subscribeToCursorPositionUpdates
+                        (\username coordinate ->
+                            CrosswordUpdated (CursorPositionUpdated username coordinate)
+                        )
+                        NoOp
                     , keyDownSubscription
                     , CountdownButton.subscriptions loadedModel.countdownButtonCheckModel (CountdownButtonCheckMsg >> CrosswordUpdated)
                     , CountdownButton.subscriptions loadedModel.countdownButtonRevealModel (CountdownButtonRevealMsg >> CrosswordUpdated)
@@ -534,7 +572,7 @@ keyDownSubscription =
 
 
 view : Shared.Model -> Model -> View Msg
-view sharedModel model =
+view _ model =
     { title = "Crossword"
     , body =
         case model of
@@ -548,12 +586,12 @@ view sharedModel model =
                 [ text "Failed to load crossword" ]
 
             Success loadedModel ->
-                [ viewCrossword sharedModel loadedModel ]
+                [ viewCrossword loadedModel ]
     }
 
 
-viewCrossword : Shared.Model -> LoadedModel -> Html Msg
-viewCrossword sharedModel loadedModel =
+viewCrossword : LoadedModel -> Html Msg
+viewCrossword loadedModel =
     let
         { crossword, selectedCoordinate, selectedDirection } =
             loadedModel
@@ -575,7 +613,6 @@ viewCrossword sharedModel loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewUsername sharedModel.username)
                 |> Build.add (viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel)
                 |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
     in
@@ -603,20 +640,6 @@ viewInfo crossword =
                 |> Build.add (text (Util.String.capitalizeFirstLetter crossword.series ++ " " ++ crossword.seriesNo ++ " - " ++ crossword.date ++ " -" ++ setByString ++ " for "))
                 |> Build.add
                     (a [ href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo) ] [ text "the Guardian" ])
-    in
-    div attributes children
-
-
-viewUsername : String -> Html Msg
-viewUsername username =
-    let
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ id "username" ]
-
-        children : List (Html Msg)
-        children =
-            [ text ("Playing as: " ++ username) ]
     in
     div attributes children
 
@@ -808,6 +831,14 @@ viewCell highlightedCoordinates loadedModel coordinate cell =
         isHighlighted =
             List.member coordinate highlightedCoordinates
 
+        usersAtCoordinate : List String
+        usersAtCoordinate =
+            loadedModel.otherUsersCursorPositions
+                |> Dict.filter (\username _ -> username /= loadedModel.username)
+                |> Dict.toList
+                |> List.filter (\( _, userCoordinate ) -> userCoordinate == coordinate)
+                |> List.map Tuple.first
+
         maybeLetter : Maybe String
         maybeLetter =
             Dict.get coordinate loadedModel.filledLetters
@@ -825,6 +856,7 @@ viewCell highlightedCoordinates loadedModel coordinate cell =
                 )
             ]
                 |> Build.addIf (coordinate == loadedModel.selectedCoordinate) (class "cell-selected")
+                |> Build.addIf (not (List.isEmpty usersAtCoordinate)) (style "position" "relative")
                 |> Build.addIf isWhite (onClick (CrosswordUpdated (CellSelected coordinate)))
                 |> Build.addIf isHighlighted (class "cell-highlighted")
 
@@ -833,6 +865,7 @@ viewCell highlightedCoordinates loadedModel coordinate cell =
             []
                 |> Build.addMaybeMap viewCellNumber (Cell.getNumber cell)
                 |> Build.addMaybeMap text maybeLetter
+                |> Build.addIf (not (List.isEmpty usersAtCoordinate)) (viewOtherUserIndicators usersAtCoordinate)
     in
     div attributes children
 
@@ -849,6 +882,61 @@ viewCellNumber cellNumber =
             [ text (String.fromInt cellNumber) ]
     in
     div attributes children
+
+
+viewOtherUserIndicators : List String -> Html Msg
+viewOtherUserIndicators usernames =
+    div
+        [ style "position" "absolute"
+        , style "top" "0.1em"
+        , style "right" "0.1em"
+        , style "display" "flex"
+        , style "flex-direction" "row"
+        , style "z-index" "2"
+        ]
+        (List.map viewOtherUserIndicator usernames)
+
+
+viewOtherUserIndicator : String -> Html Msg
+viewOtherUserIndicator username =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ style "width" "0.3em"
+            , style "height" "0.3em"
+            , style "background-color" (getUserColor username)
+            , style "border-radius" "0.05em"
+            , style "margin-left" "0.05em"
+            ]
+    in
+    div attributes []
+
+
+getUserColor : String -> String
+getUserColor username =
+    let
+        colors : List String
+        colors =
+            [ "#E74C3C" -- Red
+            , "#3498DB" -- Blue
+            , "#2ECC71" -- Green
+            , "#F39C12" -- Orange
+            , "#9B59B6" -- Purple
+            , "#E67E22" -- Dark Orange
+            , "#1ABC9C" -- Teal
+            , "#E91E63" -- Pink
+            , "#34495E" -- Dark Blue
+            , "#F1C40F" -- Yellow
+            , "#8E44AD" -- Dark Purple
+            , "#16A085" -- Dark Teal
+            ]
+
+        hash : Int
+        hash =
+            String.foldl (\char acc -> acc * 31 + Char.toCode char) 0 username
+    in
+    List.Extra.getAt (modBy (List.length colors) (abs hash)) colors
+        |> Maybe.withDefault "#E74C3C"
 
 
 viewClues : Crossword -> FilledLetters -> Maybe Clue -> List Clue -> Html Msg

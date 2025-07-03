@@ -9,7 +9,9 @@ port module Effect exposing
     , createWebsocket
     , sendWebsocketMessage
     , subscribeToWebsocket
+    , subscribeToCursorPositionUpdates
     , setupFocusInputOnClick
+    , sendCursorPositionUpdate
     )
 
 {-| This file was generated automatically by running elm-land customize effect
@@ -31,7 +33,9 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs createWebsocket
 @docs sendWebsocketMessage
 @docs subscribeToWebsocket
+@docs subscribeToCursorPositionUpdates
 @docs setupFocusInputOnClick
+@docs sendCursorPositionUpdate
 
 -}
 
@@ -259,6 +263,19 @@ sendWebsocketMessage username messages =
         }
 
 
+sendCursorPositionUpdate : String -> Coordinate -> Effect msg
+sendCursorPositionUpdate username ( x, y ) =
+    SendMessageToJavaScript
+        { tag = "SEND_WEBSOCKET_MESSAGE"
+        , data =
+            Json.Encode.object
+                [ ( "x", Json.Encode.int x )
+                , ( "y", Json.Encode.int y )
+                , ( "user", Json.Encode.string username )
+                ]
+        }
+
+
 createWebsocket : String -> String -> Effect msg
 createWebsocket crosswordId teamId =
     SendMessageToJavaScript
@@ -302,6 +319,30 @@ subscribeToWebsocket successMsg failureMsg =
             of
                 Ok filledLetters ->
                     successMsg filledLetters
+
+                Err _ ->
+                    failureMsg
+        )
+
+
+subscribeToCursorPositionUpdates : (String -> Coordinate -> msg) -> msg -> Sub msg
+subscribeToCursorPositionUpdates successMsg failureMsg =
+    messageReceiver
+        (\string ->
+            case
+                Json.Decode.decodeString
+                    (Json.Decode.map3
+                        (\x y user ->
+                            successMsg user ( x, y )
+                        )
+                        (Json.Decode.field "x" Json.Decode.int)
+                        (Json.Decode.field "y" Json.Decode.int)
+                        (Json.Decode.field "user" Json.Decode.string)
+                    )
+                    string
+            of
+                Ok msg ->
+                    msg
 
                 Err _ ->
                     failureMsg
