@@ -222,6 +222,21 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.home-icon {
+  cursor: pointer;
+  color: var(--primary-color);
+  margin-right: var(--spacing-sm);
+  transition: color 0.2s ease-in-out;
+}
+
+.home-icon:hover {
+  color: var(--text-primary);
+}
+
+.home-icon i {
+  font-size: 0.8em;
+}
+
 #username {
   text-align: center;
   font-size: 2em;

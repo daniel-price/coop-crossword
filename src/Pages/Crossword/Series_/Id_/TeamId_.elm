@@ -10,7 +10,7 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, div, input, text)
+import Html exposing (Attribute, Html, a, div, i, input, span, text)
 import Html.Attributes exposing (class, href, id, style, value)
 import Html.Events exposing (on, onClick, targetValue)
 import Html.Parser
@@ -20,6 +20,7 @@ import List.Extra
 import Page exposing (Page)
 import RemoteData exposing (RemoteData(..), WebData)
 import Route exposing (Route)
+import Route.Path
 import Shared
 import Util.Build as Build
 import Util.String
@@ -104,6 +105,7 @@ type Msg
     = NoOp
     | CrosswordFetched String String String (WebData Crossword)
     | CrosswordUpdated CrosswordUpdatedMsg
+    | NavigateToHome
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
@@ -174,6 +176,9 @@ update msg model =
                 |> resetFields crosswordUpdatedMsg
                 |> updateCrossword crosswordUpdatedMsg
                 |> Tuple.mapFirst Success
+
+        ( NavigateToHome, _ ) ->
+            model |> Effect.set (Effect.pushRoute { path = Route.Path.Home_, query = Dict.empty, hash = Nothing })
 
         _ ->
             model |> Effect.set Effect.none
@@ -637,6 +642,7 @@ viewInfo crossword =
         children : List (Html Msg)
         children =
             []
+                |> Build.add (span [ class "home-icon", onClick NavigateToHome ] [ i [ class "fas fa-home" ] [] ])
                 |> Build.add (text (Util.String.capitalizeFirstLetter crossword.series ++ " " ++ crossword.seriesNo ++ " - " ++ crossword.date ++ " -" ++ setByString ++ " for "))
                 |> Build.add
                     (a [ href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo) ] [ text "the Guardian" ])
