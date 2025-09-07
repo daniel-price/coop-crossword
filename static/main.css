@@ -19,6 +19,27 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
+  
+  /* Font Size Scale */
+  --font-xs: 0.75rem;    /* 12px */
+  --font-sm: 0.875rem;    /* 14px */
+  --font-base: 1rem;      /* 16px */
+  --font-lg: 1.125rem;   /* 18px */
+  --font-xl: 1.25rem;    /* 20px */
+  --font-2xl: 1.5rem;    /* 24px */
+  --font-3xl: 1.875rem;  /* 30px */
+  --font-4xl: 2.25rem;   /* 36px */
+  --font-5xl: 3rem;      /* 48px */
+  
+  /* Crossword-specific font sizes (scaled for crossword interface) */
+  --crossword-font-xs: 0.5em;
+  --crossword-font-sm: 0.75em;
+  --crossword-font-base: 1em;
+  --crossword-font-lg: 1.25em;
+  --crossword-font-xl: 1.5em;
+  --crossword-font-2xl: 2em;
+  --crossword-font-3xl: 2.5em;
+  --crossword-font-4xl: 3em;
 }
 
 body {
@@ -28,6 +49,7 @@ body {
   background-color: var(--background-color);
   color: var(--text-primary);
   line-height: 1.6;
+  font-size: var(--font-base);
 }
 
 #crossword {
@@ -67,7 +89,7 @@ body {
   border-left: 1px solid var(--text-primary);
   border-top: 1px solid var(--text-primary);
   background-color: var(--text-primary);
-  font-size: 4em;
+  font-size: var(--crossword-font-4xl);
 }
 
 #current-clue,
@@ -79,7 +101,7 @@ body {
   z-index: 2;
   background-color: var(--surface-color);
   text-align: center;
-  font-size: 4em;
+  font-size: var(--crossword-font-4xl);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -112,7 +134,7 @@ body {
 
 .cell-number {
   position: absolute;
-  font-size: 0.5em;
+  font-size: var(--crossword-font-xs);
   top: 0;
   left: 0.1em;
 }
@@ -134,7 +156,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  font-size: 3em;
+  font-size: var(--crossword-font-3xl);
   max-width: 800px;
     max-height: 80vh;
     overflow-y: auto;
@@ -145,7 +167,7 @@ body {
 .clue-title {
   color: var(--primary-color);
   font-weight: 600;
-  font-size: 1.2em;
+  font-size: var(--crossword-font-lg);
   margin-bottom: var(--spacing-sm);
   padding-bottom: var(--spacing-xs);
   border-bottom: 2px solid var(--border-color);
@@ -155,7 +177,7 @@ body {
   display: flex;
   padding: var(--spacing-sm);
   gap: var(--spacing-sm);
-  font-size: 1.5em;
+  font-size: var(--crossword-font-xl);
   border-radius: var(--radius-sm);
 }
 
@@ -198,7 +220,7 @@ body {
   border-radius: var(--radius-md);
   text-align: center;
   justify-content: center;
-  font-size: 4em;
+  font-size: var(--crossword-font-4xl);
   color: white;
   padding: var(--spacing-sm) var(--spacing-md);
   min-width: 6em;
@@ -213,7 +235,7 @@ body {
 #info {
   text-align: center;
   gap: var(--spacing-sm);
-  font-size: 3em;
+  font-size: var(--crossword-font-3xl);
   color: var(--text-secondary);
   padding: var(--spacing-sm);
   background-color: var(--surface-color);
@@ -234,12 +256,12 @@ body {
 }
 
 .home-icon i {
-  font-size: 0.8em;
+  font-size: var(--crossword-font-sm);
 }
 
 #username {
   text-align: center;
-  font-size: 2em;
+  font-size: var(--font-2xl);
   color: #696969;
   margin-bottom: 0.5em;
 }
@@ -257,7 +279,7 @@ body {
 }
 
 .home-title {
-  font-size: 2.5rem;
+  font-size: var(--font-5xl);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: var(--spacing-sm);
@@ -265,7 +287,7 @@ body {
 }
 
 .home-subtitle {
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
   color: var(--text-secondary);
   font-weight: 400;
 }
@@ -301,7 +323,7 @@ body {
 }
 
 .header h2 {
-  font-size: 1.5rem;
+  font-size: var(--font-2xl);
   font-weight: 600;
   color: var(--primary-color);
   margin: 0;
@@ -348,6 +370,7 @@ body {
   border: 1px solid transparent;
   transition: all 0.15s ease-in-out;
   font-weight: 500;
+  font-size: var(--font-base);
 }
 
 .link a:hover {
@@ -363,7 +386,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
   color: var(--text-secondary);
 }
 
@@ -372,7 +395,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
   color: #dc2626;
   background-color: #fef2f2;
   border: 1px solid #fecaca;
@@ -387,7 +410,7 @@ body {
   }
   
   .home-title {
-    font-size: 2rem;
+    font-size: var(--font-4xl);
   }
   
   #crosswords {
