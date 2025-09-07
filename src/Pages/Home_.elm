@@ -2,7 +2,7 @@ module Pages.Home_ exposing (LoadedModel, Model, Msg, page)
 
 import Data.CrosswordInfo as CrosswordInfo exposing (CrosswordInfo)
 import Effect exposing (Effect)
-import Html exposing (Html, a, div, text)
+import Html exposing (Html, a, div, h1, h2, p, text)
 import Html.Attributes exposing (class, href, id)
 import Page exposing (Page)
 import RemoteData exposing (RemoteData(..), WebData)
@@ -76,30 +76,38 @@ view : Shared.Model -> Model -> View Msg
 view sharedModel model =
     { title = "Crosswords"
     , body =
-        case model of
-            NotAsked ->
-                [ text "Loading..." ]
-
-            Loading ->
-                [ text "Loading..." ]
-
-            Failure _ ->
-                [ text "Failed to load crosswords" ]
-
-            Success { crosswordInfos } ->
-                [ div [ id "crosswords" ]
-                    (crosswordInfos
-                        |> splitBySeries
-                        |> List.map (viewSeries sharedModel.teamId)
-                    )
+        [ div [ class "home-container" ]
+            (div [ class "home-header" ]
+                [ h1 [ class "home-title" ] [ text "Crossword Collection" ]
+                , p [ class "home-subtitle" ] [ text "Choose a series to start solving puzzles" ]
                 ]
+                :: (case model of
+                        NotAsked ->
+                            [ div [ class "loading-state" ] [ text "Loading..." ] ]
+
+                        Loading ->
+                            [ div [ class "loading-state" ] [ text "Loading..." ] ]
+
+                        Failure _ ->
+                            [ div [ class "error-state" ] [ text "Failed to load crosswords. Please try again later." ] ]
+
+                        Success { crosswordInfos } ->
+                            [ div [ id "crosswords" ]
+                                (crosswordInfos
+                                    |> splitBySeries
+                                    |> List.map (viewSeries sharedModel.teamId)
+                                )
+                            ]
+                   )
+            )
+        ]
     }
 
 
 viewSeries : String -> ( String, List CrosswordInfo ) -> Html Msg
 viewSeries teamId ( series, items ) =
     div [ class "series" ]
-        [ div [ class "header" ] [ text (Util.String.capitalizeFirstLetter series) ]
+        [ div [ class "header" ] [ h2 [] [ text (Util.String.capitalizeFirstLetter series) ] ]
         , div [ class "links" ] (viewLinks teamId items)
         ]
 
