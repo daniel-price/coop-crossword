@@ -58,7 +58,7 @@ init flagsResult _ =
             )
 
         Err _ ->
-            ( { apiUrl = "https://cooperative-crosswords-be.fly.dev/"
+            ( { apiUrl = "https://api.allcluedup.com/"
               , teamId = "team-id"
               , username = "anonymous"
               }

@@ -74,12 +74,12 @@ subscriptions _ =
 
 view : Shared.Model -> Model -> View Msg
 view sharedModel model =
-    { title = "Crosswords"
+    { title = "All Clued Up"
     , body =
         [ div [ class "home-container" ]
             (div [ class "home-header" ]
-                [ h1 [ class "home-title" ] [ text "Crossword Collection" ]
-                , p [ class "home-subtitle" ] [ text "Choose a series to start solving puzzles" ]
+                [ h1 [ class "home-title" ] [ text "All Clued Up" ]
+                , p [ class "home-subtitle" ] [ text "Choose a crossword and share the link to solve it with your friends" ]
                 ]
                 :: (case model of
                         NotAsked ->
