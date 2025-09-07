@@ -83,10 +83,10 @@ view sharedModel model =
                 ]
                 :: (case model of
                         NotAsked ->
-                            [ div [ class "loading-state" ] [ text "Loading..." ] ]
+                            [ div [ class "loading-state" ] [ text "Getting your puzzles ready..." ] ]
 
                         Loading ->
-                            [ div [ class "loading-state" ] [ text "Loading..." ] ]
+                            [ div [ class "loading-state" ] [ text "Fetching crosswords..." ] ]
 
                         Failure _ ->
                             [ div [ class "error-state" ] [ text "Failed to load crosswords. Please try again later." ] ]

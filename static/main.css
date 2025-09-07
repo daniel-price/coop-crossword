@@ -388,6 +388,40 @@ body {
   min-height: 200px;
   font-size: var(--font-lg);
   color: var(--text-secondary);
+  position: relative;
+}
+
+.loading-state::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: var(--spacing-sm);
+}
+
+/* Crossword Loading States */
+#crossword .loading-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: var(--font-xl);
+  color: var(--text-secondary);
+  position: relative;
+}
+
+#crossword .loading-text::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color);
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: var(--spacing-sm);
 }
 
 .error-state {

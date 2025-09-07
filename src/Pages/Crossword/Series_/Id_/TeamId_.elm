@@ -582,13 +582,13 @@ view _ model =
     , body =
         case model of
             NotAsked ->
-                [ text "Loading..." ]
+                [ div [ class "loading-text" ] [ text "Preparing your crossword..." ] ]
 
             Loading ->
-                [ text "Loading..." ]
+                [ div [ class "loading-text" ] [ text "Loading puzzle..." ] ]
 
             Failure _ ->
-                [ text "Failed to load crossword" ]
+                [ div [ class "error-state" ] [ text "Oops! Couldn't load this crossword. Please try again." ] ]
 
             Success loadedModel ->
                 [ viewCrossword loadedModel ]
