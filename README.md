@@ -1,4 +1,4 @@
-# All Clued Up
+# All Clued In
 
 A website for doing crosswords with friends written in [Elm](https://elm-lang.org), using [Elm Land](https://elm.land).
 

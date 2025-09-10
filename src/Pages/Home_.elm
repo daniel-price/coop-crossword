@@ -74,11 +74,11 @@ subscriptions _ =
 
 view : Shared.Model -> Model -> View Msg
 view sharedModel model =
-    { title = "All Clued Up"
+    { title = "All Clued In"
     , body =
         [ div [ class "home-container" ]
             (div [ class "home-header" ]
-                [ h1 [ class "home-title" ] [ text "All Clued Up" ]
+                [ h1 [ class "home-title" ] [ text "All Clued In" ]
                 , p [ class "home-subtitle" ] [ text "Choose a crossword and share the link to solve it with your friends" ]
                 ]
                 :: (case model of
