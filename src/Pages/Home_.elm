@@ -83,10 +83,10 @@ view sharedModel model =
                 ]
                 :: (case model of
                         NotAsked ->
-                            [ div [ class "loading-state" ] [ text "Getting your puzzles ready..." ] ]
+                            [ viewSkeletonLoading ]
 
                         Loading ->
-                            [ div [ class "loading-state" ] [ text "Fetching crosswords..." ] ]
+                            [ viewSkeletonLoading ]
 
                         Failure _ ->
                             [ div [ class "error-state" ] [ text "Failed to load crosswords. Please try again later." ] ]
@@ -146,3 +146,40 @@ splitBySeries crosswordInfos =
             )
             []
         |> List.map (\( series, items ) -> ( series, items |> List.sortBy (\i -> i.date) |> List.reverse ))
+
+
+
+-- SKELETON LOADING VIEWS
+
+
+viewSkeletonLoading : Html Msg
+viewSkeletonLoading =
+    div [ id "crosswords" ]
+        [ viewSkeletonSeries
+        , viewSkeletonSeries
+        , viewSkeletonSeries
+        , viewSkeletonSeries
+        , viewSkeletonSeries
+        , viewSkeletonSeries
+        ]
+
+
+viewSkeletonSeries : Html Msg
+viewSkeletonSeries =
+    div [ class "skeleton-card" ]
+        [ div [ class "header" ]
+            [ div [ class "skeleton skeleton-series-header" ] [] ]
+        , div [ class "links" ]
+            [ viewSkeletonLink
+            , viewSkeletonLink
+            , viewSkeletonLink
+            , viewSkeletonLink
+            , viewSkeletonLink
+            ]
+        ]
+
+
+viewSkeletonLink : Html Msg
+viewSkeletonLink =
+    div [ class "link" ]
+        [ div [ class "skeleton skeleton-link" ] [] ]
