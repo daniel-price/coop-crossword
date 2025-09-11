@@ -23,6 +23,10 @@ export const onReady = ({ app, env }) => {
           setupFocusInputOnClick();
           return;
 
+        case "COPY_TO_CLIPBOARD":
+          copyToClipboard(data);
+          return;
+
         default:
           console.warn(`Unhandled outgoing port: "${tag}"`);
           return;
@@ -30,6 +34,37 @@ export const onReady = ({ app, env }) => {
     });
   }
 };
+
+function copyToClipboard(text) {
+  if (!navigator.clipboard) {
+    console.error("Clipboard API not available");
+    // Send failure feedback to Elm
+    if (window.elmApp && window.elmApp.ports) {
+      window.elmApp.ports.messageReceiver.send(false);
+    }
+    return;
+  }
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      console.log("Text copied to clipboard");
+      // Send success feedback to Elm
+      if (window.elmApp && window.elmApp.ports) {
+        window.elmApp.ports.messageReceiver.send(true);
+        // Reset success state after 2 seconds
+        setTimeout(() => {
+          window.elmApp.ports.messageReceiver.send(false);
+        }, 2000);
+      }
+    })
+    .catch((err) => {
+      console.error("Could not copy text: ", err);
+      // Send failure feedback to Elm
+      if (window.elmApp && window.elmApp.ports) {
+        window.elmApp.ports.messageReceiver.send(false);
+      }
+    });
+}
 
 function getTeamId() {
   const storedTeamId = localStorage.getItem("teamId");
@@ -145,7 +180,7 @@ async function setupFocusInputOnClick() {
     console.log("waiting for input to be available" + i);
   }
   const focusInput = () => {
-    document.querySelector("#input").focus();
+    document.querySelector("#input")?.focus();
   };
 
   const setOnClickToFocusInput = (selector) => {

@@ -12,6 +12,7 @@ port module Effect exposing
     , subscribeToCursorPositionUpdates
     , setupFocusInputOnClick
     , sendCursorPositionUpdate
+    , copyToClipboard
     )
 
 {-| This file was generated automatically by running elm-land customize effect
@@ -36,6 +37,7 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs subscribeToCursorPositionUpdates
 @docs setupFocusInputOnClick
 @docs sendCursorPositionUpdate
+@docs copyToClipboard
 
 -}
 
@@ -357,3 +359,11 @@ port outgoing : { tag : String, data : Json.Encode.Value } -> Cmd msg
 
 
 port messageReceiver : (String -> msg) -> Sub msg
+
+
+copyToClipboard : String -> Effect msg
+copyToClipboard string =
+    SendMessageToJavaScript
+        { tag = "COPY_TO_CLIPBOARD"
+        , data = Json.Encode.string string
+        }
