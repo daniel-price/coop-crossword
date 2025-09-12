@@ -145,15 +145,6 @@ function sendWebSocketMessage(data) {
   ws.send(JSON.stringify(data));
 }
 
-function sendCursorPositionUpdate(data) {
-  if (!ws) {
-    console.error("Websocket is not initialized");
-    return;
-  }
-
-  ws.send(JSON.stringify(data));
-}
-
 /**
  * This function is called once, as soon as the crossword is loaded,
  * and enables us to have different behaviour for touch and non-touch devices.
@@ -180,7 +171,7 @@ async function setupFocusInputOnClick() {
     console.log("waiting for input to be available" + i);
   }
   const focusInput = () => {
-    document.querySelector("#input")?.focus();
+    document.querySelector("#input").focus();
   };
 
   const setOnClickToFocusInput = (selector) => {
@@ -192,14 +183,6 @@ async function setupFocusInputOnClick() {
 
   const isTouchDevice = "ontouchstart" in document.documentElement;
   if (isTouchDevice) {
-    /**
-      *
-#current-clue-wrap {
-  position: sticky;
-  top: 0px;
-  width: 100%;
-  z-index: 2;
-}*/
     setOnClickToFocusInput(".cell, .clue");
     iosSafariPositionSticky();
     return;

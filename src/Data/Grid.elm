@@ -109,10 +109,10 @@ view additionalAttributes additionalChildren viewItem grid =
 
         attributes : List (Html.Attribute msg)
         attributes =
-            additionalAttributes
-                ++ [ style "display" "grid"
-                   , style "grid-template-columns" ("repeat(" ++ String.fromInt numberOfRows ++ ", 1fr)")
-                   ]
+            [ style "display" "grid"
+            , style "grid-template-columns" ("repeat(" ++ String.fromInt numberOfRows ++ ", 1fr)")
+            ]
+                ++ additionalAttributes
 
         children : List (Html msg)
         children =

@@ -700,8 +700,15 @@ viewCrosswordGrid highlightedCoordinates maybeHighlightedClue loadedModel =
         children =
             []
                 |> Build.addMaybeMap (\clue -> viewHeader clue loadedModel.showInfoPanel) maybeHighlightedClue
-                |> Build.addIf (not loadedModel.showInfoPanel)
-                    (Grid.view [ id "grid" ] [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ] (viewCell highlightedCoordinates loadedModel) loadedModel.crossword.grid)
+                |> Build.add
+                    (let
+                        attributes2 : List (Html.Attribute Msg)
+                        attributes2 =
+                            [ id "grid" ]
+                                |> Build.addIf loadedModel.showInfoPanel (style "display" "none")
+                     in
+                     Grid.view attributes2 [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ] (viewCell highlightedCoordinates loadedModel) loadedModel.crossword.grid
+                    )
                 |> Build.addIf loadedModel.showInfoPanel
                     (viewInfoPanel loadedModel)
     in
