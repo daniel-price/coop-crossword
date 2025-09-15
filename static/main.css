@@ -55,6 +55,11 @@ body {
   font-size: var(--font-base);
 }
 
+.hidden {
+  opacity: 0;
+  z-index: -1;
+}
+
 #crossword {
   display: flex;
   flex-wrap: wrap;

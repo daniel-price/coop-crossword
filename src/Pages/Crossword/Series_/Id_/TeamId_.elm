@@ -703,7 +703,7 @@ viewCrosswordGrid highlightedCoordinates loadedModel =
                 |> Build.add
                     (Grid.view
                         ([ id "grid" ]
-                            |> Build.addIf loadedModel.showInfoPanel (style "opacity" "0")
+                            |> Build.addIf loadedModel.showInfoPanel (class "hidden")
                         )
                         [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ]
                         (viewCell highlightedCoordinates loadedModel)
@@ -853,7 +853,7 @@ viewInfoPanel loadedModel =
         attributes : List (Html.Attribute Msg)
         attributes =
             [ id "info-panel" ]
-                |> Build.addIf (not loadedModel.showInfoPanel) (style "opacity" "0")
+                |> Build.addIf (not loadedModel.showInfoPanel) (class "hidden")
 
         linkUrl : String
         linkUrl =
