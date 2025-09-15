@@ -8,6 +8,10 @@ const debounce = function (callback, delay) {
   };
 };
 
+const isElementOnScreen = function (element) {
+  return element.getBoundingClientRect().bottom > -1;
+};
+
 /**
  * position:sticky doesn't work on iOS Safari as opening the virtual keyboard
  * moves the sticky element off the page. So this function is needed as
@@ -17,15 +21,13 @@ export const iosSafariPositionSticky = () => {
   const gridContainer = document.getElementById("grid");
   const currentClue = document.getElementById("current-clue");
   const input = document.getElementById("input");
+  const header = document.getElementById("header");
+  const headerSize = header.getBoundingClientRect().height;
 
   // function to set the margin to show the current clue if hidden
   const setMargin = function () {
-    const isGridContainerOnScreen =
-      gridContainer.getBoundingClientRect().bottom > -1;
-
-    const currentCluePosition = currentClue.getBoundingClientRect().top;
     const shouldCreateAbsoluteCurrentClue =
-      isGridContainerOnScreen && currentCluePosition < -1;
+      isElementOnScreen(gridContainer) && !isElementOnScreen(currentClue);
 
     if (!shouldCreateAbsoluteCurrentClue) {
       return;
@@ -44,8 +46,10 @@ export const iosSafariPositionSticky = () => {
 
       currentClueDuplicate.id = "current-clue-duplicate";
     }
+
     currentClueDuplicate.style["position"] = "absolute";
-    currentClueDuplicate.style["margin-top"] = Math.abs(bodyTop) + "px";
+    currentClueDuplicate.style["margin-top"] =
+      Math.abs(bodyTop + headerSize) + "px";
   };
 
   const setMarginWithDebounce = debounce(setMargin, 250);
