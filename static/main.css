@@ -134,17 +134,14 @@ body {
 }
 
 #info-panel {
+  width: calc(100% - 2px);
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: var(--surface-color);
-  border-left: 1px solid var(--text-primary);
-  border-top: 1px solid var(--text-primary);
-  border-right: 1px solid var(--text-primary);
-  border-bottom: 1px solid var(--text-primary);
-  padding: var(--spacing-lg);
+  border: 1px solid var(--text-primary);
   aspect-ratio: 1 / 1;
 }
 
