@@ -683,14 +683,15 @@ viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewCrosswordGrid highlightedCoordinates maybeHighlightedClue loadedModel)
+                |> Build.add (viewHeader maybeHighlightedClue loadedModel.showInfoPanel)
+                |> Build.add (viewCrosswordGrid highlightedCoordinates loadedModel)
                 |> Build.add (viewButtons loadedModel)
     in
     div attributes children
 
 
-viewCrosswordGrid : List Coordinate -> Maybe Clue -> LoadedModel -> Html Msg
-viewCrosswordGrid highlightedCoordinates maybeHighlightedClue loadedModel =
+viewCrosswordGrid : List Coordinate -> LoadedModel -> Html Msg
+viewCrosswordGrid highlightedCoordinates loadedModel =
     let
         attributes : List (Attribute msg)
         attributes =
@@ -699,10 +700,16 @@ viewCrosswordGrid highlightedCoordinates maybeHighlightedClue loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.addMaybeMap (\clue -> viewHeader clue loadedModel.showInfoPanel) maybeHighlightedClue
-                |> Build.addIf (not loadedModel.showInfoPanel)
-                    (Grid.view [ id "grid" ] [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ] (viewCell highlightedCoordinates loadedModel) loadedModel.crossword.grid)
-                |> Build.addIf loadedModel.showInfoPanel
+                |> Build.add
+                    (Grid.view
+                        ([ id "grid" ]
+                            |> Build.addIf loadedModel.showInfoPanel (class "hidden")
+                        )
+                        [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ]
+                        (viewCell highlightedCoordinates loadedModel)
+                        loadedModel.crossword.grid
+                    )
+                |> Build.add
                     (viewInfoPanel loadedModel)
     in
     div attributes children
@@ -779,7 +786,7 @@ viewButtons loadedModel =
     div attributes children
 
 
-viewHeader : Clue -> Bool -> Html Msg
+viewHeader : Maybe Clue -> Bool -> Html Msg
 viewHeader clue showInfoPanel =
     let
         attributes : List (Html.Attribute Msg)
@@ -790,7 +797,7 @@ viewHeader clue showInfoPanel =
         children =
             []
                 |> Build.add viewHomeButton
-                |> Build.add (viewCurrentClue clue)
+                |> Build.addMaybeMap viewCurrentClue clue
                 |> Build.add (viewInfoButton showInfoPanel)
     in
     div attributes children
@@ -846,6 +853,7 @@ viewInfoPanel loadedModel =
         attributes : List (Html.Attribute Msg)
         attributes =
             [ id "info-panel" ]
+                |> Build.addIf (not loadedModel.showInfoPanel) (class "hidden")
 
         linkUrl : String
         linkUrl =
