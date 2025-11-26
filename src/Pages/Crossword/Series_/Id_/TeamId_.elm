@@ -606,10 +606,10 @@ view _ model =
     , body =
         case model of
             NotAsked ->
-                [ div [ class "loading-text" ] [ text "Preparing your crossword..." ] ]
+                []
 
             Loading ->
-                [ div [ class "loading-text" ] [ text "Loading puzzle..." ] ]
+                viewSkeleton
 
             Failure _ ->
                 [ div [ class "error-state" ] [ text "Oops! Couldn't load this crossword. Please try again." ] ]
@@ -617,6 +617,16 @@ view _ model =
             Success loadedModel ->
                 [ viewCrossword loadedModel ]
     }
+
+
+viewSkeleton : List (Html Msg)
+viewSkeleton =
+    [ div
+        [ id "crossword"
+        ]
+        [ div [ id "grid-container" ] [ viewHeader Nothing False ]
+        ]
+    ]
 
 
 viewCrossword : LoadedModel -> Html Msg
