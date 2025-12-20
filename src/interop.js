@@ -1,5 +1,6 @@
 import { iosSafariPositionSticky } from "./ios-safari-position-sticky";
 import { generateUsername } from "unique-username-generator";
+import "./main.css";
 
 export const flags = ({ env }) => {
   return {
