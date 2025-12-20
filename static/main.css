@@ -41,6 +41,8 @@
   --crossword-font-2xl: 2em;
   --crossword-font-3xl: 2.5em;
   --crossword-font-4xl: 3em;
+  --crossword-font-5xl: 3.5em;
+  --crossword-font-6xl: 4em;
 }
 
 body {
@@ -250,7 +252,7 @@ body {
   z-index: 2;
   background-color: var(--surface-color);
   text-align: center;
-  font-size: var(--crossword-font-4xl);
+  font-size: var(--crossword-font-6xl);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
