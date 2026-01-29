@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Clued In - Homepage Mobile Design Mockup</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            --font-5xl: 3rem;
+            --accent-teal: #14b8a6;
+            --accent-yellow: #fbbf24;
+            --accent-purple: #a78bfa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: var(--font-base);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: var(--spacing-lg);
+        }
+
+        .mobile-view {
+            max-width: 375px;
+            width: 100%;
+            background: var(--surface-color);
+            border-radius: 24px;
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-lg);
+            border: 8px solid #1f2937;
+        }
+
+        .mobile-header {
+            text-align: center;
+            padding: var(--spacing-lg) var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .mobile-title {
+            font-size: var(--font-3xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.025em;
+        }
+
+        .mobile-subtitle {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .mobile-series {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .mobile-series-header {
+            font-size: var(--font-xl);
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--border-color);
+            text-transform: capitalize;
+        }
+
+        .mobile-link {
+            display: block;
+            padding: var(--spacing-md);
+            text-decoration: none;
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            transition: all 0.15s ease-in-out;
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+            background: var(--background-color);
+        }
+
+        .mobile-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div class="mobile-header">
+            <h1 class="mobile-title">All Clued In</h1>
+            <p class="mobile-subtitle">Choose a crossword and share the link to solve it with your friends</p>
+        </div>
+
+        <div class="mobile-series">
+            <div class="mobile-series-header">Everyman</div>
+            <a href="#" class="mobile-link">1 - Monday, 1 January 2024</a>
+            <a href="#" class="mobile-link">2 - Tuesday, 2 January 2024</a>
+            <a href="#" class="mobile-link">3 - Wednesday, 3 January 2024</a>
+            <a href="#" class="mobile-link">4 - Thursday, 4 January 2024</a>
+            <a href="#" class="mobile-link">5 - Friday, 5 January 2024</a>
+        </div>
+
+        <div class="mobile-series">
+            <div class="mobile-series-header">Quick</div>
+            <a href="#" class="mobile-link">1 - Monday, 1 January 2024</a>
+            <a href="#" class="mobile-link">2 - Tuesday, 2 January 2024</a>
+            <a href="#" class="mobile-link">3 - Wednesday, 3 January 2024</a>
+        </div>
+
+        <div class="mobile-series">
+            <div class="mobile-series-header">Cryptic</div>
+            <a href="#" class="mobile-link">1 - Monday, 1 January 2024</a>
+            <a href="#" class="mobile-link">2 - Tuesday, 2 January 2024</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,13 +4,18 @@ This directory contains interactive HTML/CSS mockups showcasing the improved des
 
 ## Files
 
-- **homepage-mockup.html** - Homepage design showing mobile and desktop views
-- **crossword-page-mockup.html** - Crossword solving page design with all features
+### Homepage Mockups
+- **homepage-mockup-mobile.html** - Homepage mobile design (375px width)
+- **homepage-mockup-desktop.html** - Homepage desktop design (responsive grid layout)
+
+### Crossword Page Mockups
+- **crossword-page-mockup-mobile.html** - Crossword solving page mobile design
+- **crossword-page-mockup-desktop.html** - Crossword solving page desktop design
 
 ## How to Use
 
 1. Open any of the HTML files in a modern web browser
-2. Use the toggle buttons at the top to switch between mobile and desktop views
+2. Each file shows a specific view (mobile or desktop) optimized for that screen size
 3. The mockups are interactive and demonstrate:
    - Visual design improvements
    - Responsive layouts

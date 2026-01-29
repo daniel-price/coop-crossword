@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Clued In - Crossword Page Mobile Design Mockup</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --accent-teal: #14b8a6;
+            --accent-yellow: #fbbf24;
+            --accent-light-blue: #60a5fa;
+            --cell-selected-bg: #eff6ff;
+            --cell-highlighted-bg: #fef3c7;
+            --clue-selected-bg: #fef3c7;
+            --clue-selected-border: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: var(--font-base);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: var(--spacing-lg);
+        }
+
+        .mobile-view {
+            max-width: 375px;
+            width: 100%;
+            background: var(--surface-color);
+            border-radius: 24px;
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-lg);
+            border: 8px solid #1f2937;
+            min-height: 800px;
+        }
+
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .mobile-header button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: var(--font-xl);
+            cursor: pointer;
+            padding: var(--spacing-xs);
+        }
+
+        .mobile-header button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-sm);
+        }
+
+        .mobile-current-clue {
+            background: var(--surface-color);
+            text-align: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-sm);
+            font-weight: 600;
+        }
+
+        .mobile-grid-container {
+            width: 100%;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .mobile-grid {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid var(--text-primary);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            background: var(--text-primary);
+        }
+
+        .mobile-cell {
+            aspect-ratio: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--text-primary);
+            border-bottom: 1px solid var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .mobile-cell.white {
+            background: var(--surface-color);
+        }
+
+        .mobile-cell.black {
+            background: var(--text-primary);
+        }
+
+        .mobile-cell.selected {
+            outline: 3px solid var(--primary-color);
+            outline-offset: -1px;
+            background: var(--cell-selected-bg) !important;
+        }
+
+        .mobile-cell.highlighted {
+            background: var(--cell-highlighted-bg) !important;
+        }
+
+        .mobile-cell-number {
+            position: absolute;
+            font-size: 0.5rem;
+            top: 2px;
+            left: 2px;
+            color: var(--text-primary);
+        }
+
+        .mobile-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .mobile-button {
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--primary-color);
+            color: white;
+            font-size: var(--font-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .mobile-button:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .mobile-clues {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: var(--spacing-sm);
+        }
+
+        .mobile-clue-title {
+            font-size: var(--font-sm);
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+            padding-bottom: var(--spacing-xs);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-clue {
+            padding: var(--spacing-xs);
+            margin-bottom: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-xs);
+            cursor: pointer;
+        }
+
+        .mobile-clue.selected {
+            background: var(--clue-selected-bg);
+            outline: 1px solid var(--clue-selected-border);
+        }
+
+        .mobile-clue.filled {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div class="mobile-header">
+            <button>←</button>
+            <button>ℹ</button>
+        </div>
+
+        <div class="mobile-current-clue">
+            1 Across: First clue text here
+        </div>
+
+        <div class="mobile-grid-container">
+            <div class="mobile-grid">
+                <div class="mobile-cell white selected">
+                    <span class="mobile-cell-number">1</span>
+                    <span>H</span>
+                </div>
+                <div class="mobile-cell white highlighted">
+                    <span>E</span>
+                </div>
+                <div class="mobile-cell white highlighted">
+                    <span>L</span>
+                </div>
+                <div class="mobile-cell white highlighted">
+                    <span>L</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>O</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span class="mobile-cell-number">2</span>
+                </div>
+                <div class="mobile-cell black"></div>
+                <div class="mobile-cell white">
+                    <span>W</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>O</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>R</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span class="mobile-cell-number">3</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>L</span>
+                </div>
+                <div class="mobile-cell black"></div>
+                <div class="mobile-cell white">
+                    <span>D</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>!</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>X</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>Y</span>
+                </div>
+                <div class="mobile-cell black"></div>
+                <div class="mobile-cell white">
+                    <span>Z</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>!</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>A</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>B</span>
+                </div>
+                <div class="mobile-cell black"></div>
+                <div class="mobile-cell white">
+                    <span>C</span>
+                </div>
+                <div class="mobile-cell white">
+                    <span>D</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-buttons">
+            <button class="mobile-button">Check</button>
+            <button class="mobile-button">Reveal</button>
+            <button class="mobile-button">Clear</button>
+        </div>
+
+        <div class="mobile-clues">
+            <div class="mobile-clue-title">Across</div>
+            <div class="mobile-clue selected">
+                <strong>1.</strong> First clue text here
+            </div>
+            <div class="mobile-clue">
+                <strong>2.</strong> Second clue text here
+            </div>
+            <div class="mobile-clue filled">
+                <strong>3.</strong> Third clue (completed)
+            </div>
+            <div class="mobile-clue-title" style="margin-top: var(--spacing-sm);">Down</div>
+            <div class="mobile-clue">
+                <strong>1.</strong> First down clue
+            </div>
+            <div class="mobile-clue">
+                <strong>2.</strong> Second down clue
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive cell selection
+        document.querySelectorAll('.mobile-cell.white').forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Remove selected from siblings
+                this.parentElement.querySelectorAll('.selected').forEach(c => c.classList.remove('selected'));
+                // Add selected to clicked cell
+                this.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>
