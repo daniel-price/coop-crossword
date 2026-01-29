@@ -169,25 +169,13 @@
             height: 20px;
             display: inline-flex;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
         }
 
-        .icon-share::before {
-            content: '↪';
-            font-size: 14px;
-            position: absolute;
-            left: 0;
-        }
-
-        .icon-share::after {
-            content: '○○○';
-            font-size: 5px;
-            letter-spacing: 1.5px;
-            position: absolute;
-            right: -2px;
-            top: 50%;
-            transform: translateY(-50%);
-            line-height: 1;
+        .icon-share svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
         }
 
         .mobile-current-clue {
@@ -393,7 +381,13 @@
             </div>
             <div class="mobile-header-right">
                 <button onclick="openDrawer('info')" aria-label="Info"><span class="icon-info">i</span></button>
-                <button onclick="openDrawer('share')" aria-label="Share"><span class="icon-share"></span></button>
+                <button onclick="openDrawer('share')" aria-label="Share">
+                    <span class="icon-share">
+                        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z"/>
+                        </svg>
+                    </span>
+                </button>
             </div>
         </div>
 
