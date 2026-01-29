@@ -67,7 +67,7 @@
             width: 100%;
             background: var(--surface-color);
             border-radius: 20px;
-            padding: var(--spacing-sm);
+            padding: 0;
             box-shadow: var(--shadow-lg);
             border: 2px solid var(--border-color);
             min-height: 800px;
@@ -85,7 +85,7 @@
             margin-bottom: var(--spacing-sm);
             gap: var(--spacing-sm);
             background: var(--text-primary);
-            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            border-radius: 18px 18px 0 0;
         }
 
         .mobile-header-left {
@@ -157,6 +157,7 @@
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
+            margin: var(--spacing-sm);
             margin-bottom: var(--spacing-sm);
             font-size: var(--font-xs);
             font-weight: 600;
@@ -164,7 +165,7 @@
 
         .mobile-grid-container {
             width: 100%;
-            margin-bottom: var(--spacing-sm);
+            margin: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
         }
 
         .mobile-grid {
@@ -222,7 +223,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: var(--spacing-xs);
-            margin-bottom: var(--spacing-sm);
+            margin: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
         }
 
         .mobile-button {
@@ -246,7 +247,7 @@
         .mobile-clues {
             max-height: 200px;
             overflow-y: auto;
-            padding: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
         }
 
         .mobile-clue-title {
