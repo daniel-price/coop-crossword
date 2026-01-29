@@ -71,6 +71,7 @@
             min-height: 800px;
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
         }
 
         .mobile-header {
@@ -271,7 +272,7 @@
 
         /* Drawer Styles */
         .mobile-drawer {
-            position: fixed;
+            position: absolute;
             top: 0;
             right: -100%;
             width: 85%;
@@ -282,6 +283,7 @@
             z-index: 1000;
             transition: right 0.3s ease-in-out;
             overflow-y: auto;
+            border-radius: 0 24px 24px 0;
         }
 
         .mobile-drawer.open {
@@ -316,16 +318,17 @@
         }
 
         .mobile-drawer-overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 998;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease-in-out;
+            border-radius: 24px;
         }
 
         .mobile-drawer-overlay.open {
@@ -471,10 +474,9 @@
                 <a href="#" style="color: var(--primary-color);">View on The Guardian</a>
             </p>
         </div>
-    </div>
 
-    <!-- Share Drawer -->
-    <div class="mobile-drawer" id="share-drawer">
+        <!-- Share Drawer -->
+        <div class="mobile-drawer" id="share-drawer">
         <div class="mobile-drawer-header">
             <div class="mobile-drawer-title">Share Crossword</div>
             <button class="mobile-drawer-close" onclick="closeDrawer()">×</button>
