@@ -79,7 +79,6 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: var(--spacing-lg);
             gap: var(--spacing-md);
-            background: var(--text-primary);
         }
 
         .desktop-header-left {
@@ -91,8 +90,8 @@
         .desktop-header-favicon {
             width: 40px;
             height: 40px;
-            background: white;
-            color: var(--text-primary);
+            background: var(--text-primary);
+            color: white;
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
@@ -102,19 +101,18 @@
             text-decoration: none;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            border: 1px solid white;
+            border: 1px solid var(--border-color);
         }
 
         .desktop-header-favicon:hover {
             background: var(--accent-teal);
-            color: white;
             transform: scale(1.05);
         }
 
         .desktop-header-title {
             font-size: var(--font-xl);
             font-weight: 600;
-            color: white;
+            color: var(--text-primary);
             text-transform: capitalize;
         }
 
@@ -127,7 +125,7 @@
         .desktop-header button {
             background: none;
             border: none;
-            color: white;
+            color: var(--accent-teal);
             font-size: var(--font-xl);
             cursor: pointer;
             padding: var(--spacing-sm);
@@ -144,6 +142,46 @@
             background-color: var(--accent-teal);
             color: white;
             transform: scale(1.1);
+        }
+
+        .icon-info {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1;
+        }
+
+        .icon-share {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-share::before {
+            content: '↪';
+            font-size: 18px;
+            position: absolute;
+        }
+
+        .icon-share::after {
+            content: '○○○';
+            font-size: 7px;
+            letter-spacing: 3px;
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .desktop-current-clue {
@@ -402,8 +440,8 @@
                     <div class="desktop-header-title">Everyman</div>
                 </div>
                 <div class="desktop-header-right">
-                    <button onclick="openModal('info')" aria-label="Info">ℹ</button>
-                    <button onclick="openModal('share')" aria-label="Share">🔗</button>
+                    <button onclick="openModal('info')" aria-label="Info"><span class="icon-info">i</span></button>
+                    <button onclick="openModal('share')" aria-label="Share"><span class="icon-share"></span></button>
                 </div>
             </div>
 

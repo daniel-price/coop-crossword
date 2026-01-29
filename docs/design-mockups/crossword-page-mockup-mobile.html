@@ -67,7 +67,7 @@
             width: 100%;
             background: var(--surface-color);
             border-radius: 20px;
-            padding: 0;
+            padding: var(--spacing-sm);
             box-shadow: var(--shadow-lg);
             border: 2px solid var(--border-color);
             min-height: 800px;
@@ -84,8 +84,6 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: var(--spacing-sm);
             gap: var(--spacing-sm);
-            background: var(--text-primary);
-            border-radius: 18px 18px 0 0;
         }
 
         .mobile-header-left {
@@ -97,8 +95,8 @@
         .mobile-header-favicon {
             width: 32px;
             height: 32px;
-            background: white;
-            color: var(--text-primary);
+            background: var(--text-primary);
+            color: white;
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
@@ -108,19 +106,18 @@
             text-decoration: none;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            border: 1px solid white;
+            border: 1px solid var(--border-color);
         }
 
         .mobile-header-favicon:hover {
             background: var(--accent-teal);
-            color: white;
             transform: scale(1.05);
         }
 
         .mobile-header-title {
             font-size: var(--font-base);
             font-weight: 600;
-            color: white;
+            color: var(--text-primary);
             text-transform: capitalize;
         }
 
@@ -133,7 +130,7 @@
         .mobile-header button {
             background: none;
             border: none;
-            color: white;
+            color: var(--accent-teal);
             font-size: var(--font-lg);
             cursor: pointer;
             padding: var(--spacing-xs);
@@ -151,13 +148,52 @@
             color: white;
         }
 
+        .icon-info {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid currentColor;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-style: normal;
+            line-height: 1;
+        }
+
+        .icon-share {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-share::before {
+            content: '↪';
+            font-size: 16px;
+            position: absolute;
+        }
+
+        .icon-share::after {
+            content: '○○○';
+            font-size: 6px;
+            letter-spacing: 2px;
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
         .mobile-current-clue {
             background: var(--surface-color);
             text-align: center;
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
-            margin: var(--spacing-sm);
             margin-bottom: var(--spacing-sm);
             font-size: var(--font-xs);
             font-weight: 600;
@@ -165,7 +201,7 @@
 
         .mobile-grid-container {
             width: 100%;
-            margin: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
         }
 
         .mobile-grid {
@@ -223,7 +259,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: var(--spacing-xs);
-            margin: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
         }
 
         .mobile-button {
@@ -247,7 +283,7 @@
         .mobile-clues {
             max-height: 200px;
             overflow-y: auto;
-            padding: var(--spacing-xs) var(--spacing-sm);
+            padding: var(--spacing-xs);
         }
 
         .mobile-clue-title {
@@ -354,8 +390,8 @@
                 <div class="mobile-header-title">Everyman</div>
             </div>
             <div class="mobile-header-right">
-                <button onclick="openDrawer('info')" aria-label="Info">ℹ</button>
-                <button onclick="openDrawer('share')" aria-label="Share">🔗</button>
+                <button onclick="openDrawer('info')" aria-label="Info"><span class="icon-info">i</span></button>
+                <button onclick="openDrawer('share')" aria-label="Share"><span class="icon-share"></span></button>
             </div>
         </div>
 
