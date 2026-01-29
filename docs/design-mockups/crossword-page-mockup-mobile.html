@@ -169,23 +169,25 @@
             height: 20px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         .icon-share::before {
             content: '↪';
-            font-size: 16px;
+            font-size: 14px;
             position: absolute;
+            left: 0;
         }
 
         .icon-share::after {
             content: '○○○';
-            font-size: 6px;
-            letter-spacing: 2px;
+            font-size: 5px;
+            letter-spacing: 1.5px;
             position: absolute;
-            right: -8px;
+            right: -2px;
             top: 50%;
             transform: translateY(-50%);
+            line-height: 1;
         }
 
         .mobile-current-clue {

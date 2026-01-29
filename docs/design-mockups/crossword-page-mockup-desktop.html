@@ -165,23 +165,25 @@
             height: 24px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         .icon-share::before {
             content: '↪';
-            font-size: 18px;
+            font-size: 16px;
             position: absolute;
+            left: 0;
         }
 
         .icon-share::after {
             content: '○○○';
-            font-size: 7px;
-            letter-spacing: 3px;
+            font-size: 6px;
+            letter-spacing: 2px;
             position: absolute;
-            right: -10px;
+            right: -2px;
             top: 50%;
             transform: translateY(-50%);
+            line-height: 1;
         }
 
         .desktop-current-clue {
