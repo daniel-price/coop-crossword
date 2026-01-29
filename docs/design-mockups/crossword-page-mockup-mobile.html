@@ -80,21 +80,68 @@
             padding: var(--spacing-xs) var(--spacing-sm);
             border-bottom: 1px solid var(--border-color);
             margin-bottom: var(--spacing-sm);
+            gap: var(--spacing-sm);
+        }
+
+        .mobile-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .mobile-header-favicon {
+            width: 32px;
+            height: 32px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--font-lg);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .mobile-header-favicon:hover {
+            background: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .mobile-header-title {
+            font-size: var(--font-base);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        .mobile-header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
         }
 
         .mobile-header button {
             background: none;
             border: none;
             color: var(--primary-color);
-            font-size: var(--font-xl);
+            font-size: var(--font-lg);
             cursor: pointer;
             padding: var(--spacing-xs);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease-in-out;
         }
 
         .mobile-header button:hover {
             background-color: var(--primary-color);
             color: white;
-            border-radius: var(--radius-sm);
         }
 
         .mobile-current-clue {
@@ -221,13 +268,83 @@
             text-decoration: line-through;
             opacity: 0.6;
         }
+
+        /* Drawer Styles */
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 85%;
+            max-width: 320px;
+            height: 100%;
+            background: var(--surface-color);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: right 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .mobile-drawer.open {
+            right: 0;
+        }
+
+        .mobile-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-drawer-title {
+            font-size: var(--font-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mobile-drawer-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: var(--font-xl);
+            cursor: pointer;
+            padding: var(--spacing-xs);
+        }
+
+        .mobile-drawer-content {
+            padding: var(--spacing-md);
+        }
+
+        .mobile-drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .mobile-drawer-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
     </style>
 </head>
 <body>
     <div class="mobile-view">
         <div class="mobile-header">
-            <button>←</button>
-            <button>ℹ</button>
+            <div class="mobile-header-left">
+                <a href="#" class="mobile-header-favicon">A</a>
+                <div class="mobile-header-title">Everyman</div>
+            </div>
+            <div class="mobile-header-right">
+                <button onclick="openDrawer('info')" aria-label="Info">ℹ</button>
+                <button onclick="openDrawer('share')" aria-label="Share">🔗</button>
+            </div>
         </div>
 
         <div class="mobile-current-clue">
@@ -263,6 +380,42 @@
             </div>
             <div class="mobile-clue">
                 <strong>2.</strong> Second down clue
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Overlay -->
+    <div class="mobile-drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+    <!-- Info Drawer -->
+    <div class="mobile-drawer" id="info-drawer">
+        <div class="mobile-drawer-header">
+            <div class="mobile-drawer-title">Crossword Information</div>
+            <button class="mobile-drawer-close" onclick="closeDrawer()">×</button>
+        </div>
+        <div class="mobile-drawer-content">
+            <p><strong>Series:</strong> Everyman</p>
+            <p><strong>Number:</strong> 1</p>
+            <p><strong>Date:</strong> Monday, 1 January 2024</p>
+            <p><strong>Setter:</strong> Crossword Setter Name</p>
+            <p style="margin-top: var(--spacing-md);">
+                <a href="#" style="color: var(--primary-color);">View on The Guardian</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Share Drawer -->
+    <div class="mobile-drawer" id="share-drawer">
+        <div class="mobile-drawer-header">
+            <div class="mobile-drawer-title">Share Crossword</div>
+            <button class="mobile-drawer-close" onclick="closeDrawer()">×</button>
+        </div>
+        <div class="mobile-drawer-content">
+            <p style="margin-bottom: var(--spacing-sm);">Share this link to solve together:</p>
+            <div style="display: flex; gap: var(--spacing-xs); margin-bottom: var(--spacing-md);">
+                <input type="text" value="https://example.com/crossword/everyman/1/team123" readonly 
+                       style="flex: 1; padding: var(--spacing-xs); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: var(--font-xs);">
+                <button onclick="copyLink()" style="padding: var(--spacing-xs) var(--spacing-sm); background: var(--primary-color); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: var(--font-xs);">Copy</button>
             </div>
         </div>
     </div>
@@ -336,6 +489,26 @@
                 this.classList.add('selected');
             });
         });
+
+        // Drawer functions
+        function openDrawer(type) {
+            const drawer = document.getElementById(type + '-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            drawer.classList.add('open');
+            overlay.classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.querySelectorAll('.mobile-drawer').forEach(drawer => drawer.classList.remove('open'));
+            document.getElementById('drawer-overlay').classList.remove('open');
+        }
+
+        function copyLink() {
+            const input = document.querySelector('#share-drawer input');
+            input.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
     </script>
 </body>
 </html>

@@ -76,6 +76,47 @@
             padding: var(--spacing-md);
             border-bottom: 1px solid var(--border-color);
             margin-bottom: var(--spacing-lg);
+            gap: var(--spacing-md);
+        }
+
+        .desktop-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .desktop-header-favicon {
+            width: 40px;
+            height: 40px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--font-xl);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .desktop-header-favicon:hover {
+            background: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .desktop-header-title {
+            font-size: var(--font-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        .desktop-header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
         }
 
         .desktop-header button {
@@ -87,6 +128,11 @@
             padding: var(--spacing-sm);
             border-radius: var(--radius-sm);
             transition: all 0.2s ease-in-out;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .desktop-header button:hover {
@@ -254,6 +300,69 @@
             flex: 1;
         }
 
+        /* Drawer/Modal Styles */
+        .desktop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .desktop-modal.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .desktop-modal-content {
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .desktop-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .desktop-modal-title {
+            font-size: var(--font-2xl);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .desktop-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: var(--font-2xl);
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            line-height: 1;
+        }
+
+        .desktop-modal-close:hover {
+            color: var(--text-primary);
+        }
+
         @media (max-width: 1024px) {
             .crossword-container {
                 flex-direction: column;
@@ -270,8 +379,14 @@
     <div class="crossword-container">
         <div class="crossword-main">
             <div class="desktop-header">
-                <button>← Home</button>
-                <button>ℹ Info</button>
+                <div class="desktop-header-left">
+                    <a href="#" class="desktop-header-favicon">A</a>
+                    <div class="desktop-header-title">Everyman</div>
+                </div>
+                <div class="desktop-header-right">
+                    <button onclick="openModal('info')" aria-label="Info">ℹ</button>
+                    <button onclick="openModal('share')" aria-label="Share">🔗</button>
+                </div>
             </div>
 
             <div class="desktop-current-clue">
@@ -334,6 +449,43 @@
                 <div class="desktop-clue">
                     <span class="desktop-clue-number">5</span>
                     <span class="desktop-clue-text">Fifth down clue</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="desktop-modal" id="info-modal">
+        <div class="desktop-modal-content">
+            <div class="desktop-modal-header">
+                <div class="desktop-modal-title">Crossword Information</div>
+                <button class="desktop-modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div>
+                <p style="margin-bottom: var(--spacing-sm);"><strong>Series:</strong> Everyman</p>
+                <p style="margin-bottom: var(--spacing-sm);"><strong>Number:</strong> 1</p>
+                <p style="margin-bottom: var(--spacing-sm);"><strong>Date:</strong> Monday, 1 January 2024</p>
+                <p style="margin-bottom: var(--spacing-md);"><strong>Setter:</strong> Crossword Setter Name</p>
+                <p>
+                    <a href="#" style="color: var(--primary-color); text-decoration: none;">View on The Guardian →</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="desktop-modal" id="share-modal">
+        <div class="desktop-modal-content">
+            <div class="desktop-modal-header">
+                <div class="desktop-modal-title">Share Crossword</div>
+                <button class="desktop-modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div>
+                <p style="margin-bottom: var(--spacing-md);">Share this link to solve together:</p>
+                <div style="display: flex; gap: var(--spacing-sm);">
+                    <input type="text" value="https://example.com/crossword/everyman/1/team123" readonly 
+                           style="flex: 1; padding: var(--spacing-sm); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: var(--font-base);">
+                    <button onclick="copyLink()" style="padding: var(--spacing-sm) var(--spacing-lg); background: var(--primary-color); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600;">Copy</button>
                 </div>
             </div>
         </div>
@@ -406,6 +558,32 @@
                 this.parentElement.querySelectorAll('.selected').forEach(c => c.classList.remove('selected'));
                 // Add selected to clicked cell
                 this.classList.add('selected');
+            });
+        });
+
+        // Modal functions
+        function openModal(type) {
+            const modal = document.getElementById(type + '-modal');
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.desktop-modal').forEach(modal => modal.classList.remove('open'));
+        }
+
+        function copyLink() {
+            const input = document.querySelector('#share-modal input');
+            input.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.desktop-modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
             });
         });
     </script>
