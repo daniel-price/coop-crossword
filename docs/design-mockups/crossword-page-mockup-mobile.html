@@ -84,6 +84,8 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: var(--spacing-sm);
             gap: var(--spacing-sm);
+            background: var(--text-primary);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
         }
 
         .mobile-header-left {
@@ -95,8 +97,8 @@
         .mobile-header-favicon {
             width: 32px;
             height: 32px;
-            background: var(--text-primary);
-            color: white;
+            background: white;
+            color: var(--text-primary);
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
@@ -106,18 +108,19 @@
             text-decoration: none;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            border: 1px solid var(--border-color);
+            border: 1px solid white;
         }
 
         .mobile-header-favicon:hover {
             background: var(--accent-teal);
+            color: white;
             transform: scale(1.05);
         }
 
         .mobile-header-title {
             font-size: var(--font-base);
             font-weight: 600;
-            color: var(--text-primary);
+            color: white;
             text-transform: capitalize;
         }
 
@@ -130,7 +133,7 @@
         .mobile-header button {
             background: none;
             border: none;
-            color: var(--accent-teal);
+            color: white;
             font-size: var(--font-lg);
             cursor: pointer;
             padding: var(--spacing-xs);
