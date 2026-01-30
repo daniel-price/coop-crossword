@@ -68,12 +68,11 @@ body {
 }
 
 #crossword {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   padding: 0;
   gap: 0;
   font-size: min(1vw, 6px);
-  width: max-content;
   max-width: 100%;
   margin: 0 auto;
   align-items: flex-start;
@@ -82,6 +81,7 @@ body {
 #header {
   flex: 0 0 100%;
   box-sizing: border-box;
+  min-width: max-content;
 }
 
 #grid-container,
