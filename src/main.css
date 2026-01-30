@@ -69,19 +69,24 @@ body {
 
 #crossword {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   padding: 0;
   gap: 0;
   font-size: min(1vw, 6px);
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
-  justify-content: flex-start;
-  align-items: flex-start;
+  align-items: stretch;
+}
+
+#crossword-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  width: 100%;
 }
 
 #header {
-  flex-basis: 100%;
   width: 100%;
 }
 
@@ -102,6 +107,7 @@ body {
   flex-direction: column;
   margin: 0;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 #crossword-grid {
@@ -388,6 +394,7 @@ body {
   padding: var(--spacing-sm);
   margin: 0;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .clue-title {
