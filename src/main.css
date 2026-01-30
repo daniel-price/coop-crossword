@@ -76,8 +76,13 @@ body {
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
+}
+
+#header {
+  flex-basis: 100%;
+  width: 100%;
 }
 
 #input {
