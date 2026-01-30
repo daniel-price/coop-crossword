@@ -655,6 +655,7 @@ viewCrossword loadedModel =
         children : List (Html Msg)
         children =
             []
+                |> Build.add (viewHeader loadedModel.crossword.series loadedModel.showInfoPanel loadedModel.showSharePanel)
                 |> Build.add (viewGridContainer highlightedCoordinates loadedModel)
                 |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
     in
@@ -696,7 +697,6 @@ viewGridContainer highlightedCoordinates loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewHeader loadedModel.crossword.series loadedModel.showInfoPanel loadedModel.showSharePanel)
                 |> Build.add (viewCrosswordGrid highlightedCoordinates loadedModel)
                 |> Build.add (viewButtons loadedModel)
     in
