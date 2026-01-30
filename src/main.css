@@ -355,7 +355,7 @@ body {
 }
 
 .cell-selected {
-  outline: 3px solid var(--text-primary);
+  outline: 3px solid var(--secondary-color);
   outline-offset: -1px;
   z-index: 1;
   background-color: var(--surface-color) !important;
