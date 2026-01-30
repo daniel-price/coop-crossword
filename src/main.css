@@ -1,6 +1,6 @@
 :root {
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
+  --primary-color: #000000;
+  --primary-hover: #000000;
   --secondary-color: #64748b;
   --background-color: #f8fafc;
   --surface-color: #ffffff;
@@ -355,10 +355,10 @@ body {
 }
 
 .cell-selected {
-  outline: 3px solid var(--primary-color);
+  outline: 3px solid var(--text-primary);
   outline-offset: -1px;
   z-index: 1;
-  background-color: #eff6ff !important;
+  background-color: var(--surface-color) !important;
 }
 
 .cell-highlighted {
