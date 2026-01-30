@@ -766,12 +766,12 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonRevealModel
                         , initial =
                             { text = "Reveal"
-                            , color = "#000000"
+                            , color = "#ffffff"
                             , onClick = CrosswordUpdated Reveal
                             }
                         , clicked =
                             { text = "Reveal All"
-                            , color = "#000000"
+                            , color = "#ffffff"
                             , onClick = CrosswordUpdated RevealAll
                             }
                         , toParentMsg = CountdownButtonRevealMsg >> CrosswordUpdated
@@ -783,12 +783,12 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonClearModel
                         , initial =
                             { text = "Clear"
-                            , color = "#000000"
+                            , color = "#ffffff"
                             , onClick = CrosswordUpdated Clear
                             }
                         , clicked =
                             { text = "Clear All"
-                            , color = "#000000"
+                            , color = "#ffffff"
                             , onClick = CrosswordUpdated ClearAll
                             }
                         , toParentMsg = CountdownButtonClearMsg >> CrosswordUpdated
