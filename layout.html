@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 700px), 700px));
+            gap: 20px;
+            width: 100%;
+            max-width: 1400px;
+            justify-content: center;
+        }
+
+        header {
+            background-color: #e0e0e0;
+            border: 2px solid #333;
+            padding: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .boxes-container {
+            display: contents;
+        }
+
+        .box {
+            background-color: #f0f0f0;
+            border: 2px solid #666;
+            padding: 20px;
+            min-width: 0;
+        }
+
+        .box-1 {
+            background-color: #e8f4f8;
+        }
+
+        .box-2 {
+            background-color: #f8e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HEADER</h1>
+        </header>
+        <div class="boxes-container">
+            <div class="box box-1">
+                <h2>BOX 1</h2>
+                <p>This is Box 1 with a maximum width of 700px. It's responsive and will shrink on smaller screens.</p>
+            </div>
+            <div class="box box-2">
+                <h2>BOX 2</h2>
+                <p>This is Box 2 with the same width as Box 1. It will stack below Box 1 when there's not enough room.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
