@@ -10,7 +10,7 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, i, input, span, text)
+import Html exposing (Attribute, Html, a, button, div, i, input, text)
 import Html.Attributes exposing (class, href, id, style, value)
 import Html.Events exposing (on, onClick, targetValue)
 import Html.Parser
@@ -870,18 +870,7 @@ viewShareButton showSharePanel =
 
         children : List (Html Msg)
         children =
-            [ span [ class "icon-share" ]
-                [ Html.node "svg"
-                    [ Html.Attributes.attribute "viewBox" "0 0 448 512"
-                    , Html.Attributes.attribute "xmlns" "http://www.w3.org/2000/svg"
-                    ]
-                    [ Html.node "path"
-                        [ Html.Attributes.attribute "d" "M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z"
-                        ]
-                        []
-                    ]
-                ]
-            ]
+            [ i [ class "fas fa-share" ] [] ]
     in
     button attributes children
 

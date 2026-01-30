@@ -196,20 +196,6 @@ body {
   font-size: 1.2em;
 }
 
-.icon-share {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-share svg {
-  width: 100%;
-  height: 100%;
-  fill: currentColor;
-}
 
 #info-panel {
   width: calc(100% - 2px);
@@ -770,8 +756,4 @@ body {
   }
 
 
-  .icon-share {
-    width: 20px;
-    height: 20px;
-  }
 }
