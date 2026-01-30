@@ -68,28 +68,24 @@ body {
 }
 
 #crossword {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   padding: 0;
   gap: 0;
   font-size: min(1vw, 6px);
   width: max-content;
   max-width: 100%;
   margin: 0 auto;
-  justify-items: stretch;
 }
 
 #header {
-  grid-column: 1 / -1;
   width: 100%;
   box-sizing: border-box;
 }
 
-#crossword-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  width: 100%;
+#grid-container,
+#clues {
+  flex-shrink: 0;
 }
 
 #input {
