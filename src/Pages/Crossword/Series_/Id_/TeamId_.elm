@@ -10,7 +10,7 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, i, input, text)
+import Html exposing (Attribute, Html, a, button, div, input, span, text)
 import Html.Attributes exposing (class, href, id, style, value)
 import Html.Events exposing (on, onClick, targetValue)
 import Html.Parser
@@ -51,6 +51,7 @@ type alias LoadedModel =
     , countdownButtonClearModel : CountdownButton.Model
     , username : String
     , showInfoPanel : Bool
+    , showSharePanel : Bool
     , teamId : String
     , copyButtonClicked : Bool
     }
@@ -103,6 +104,7 @@ type CrosswordUpdatedMsg
     | CountdownButtonClearMsg (CountdownButton.Msg Msg)
       -- Info panel
     | ToggleInfo
+    | ToggleShare
     | CopyLink String
 
 
@@ -153,6 +155,7 @@ update msg model =
                                 , countdownButtonClearModel = CountdownButton.init
                                 , username = username
                                 , showInfoPanel = False
+                                , showSharePanel = False
                                 , teamId = teamId
                                 , copyButtonClicked = False
                                 }
@@ -378,6 +381,11 @@ updateCrossword msg loadedModel =
                 |> setShowInfoPanel (not loadedModel.showInfoPanel)
                 |> Effect.set Effect.none
 
+        ToggleShare ->
+            loadedModel
+                |> setShowSharePanel (not loadedModel.showSharePanel)
+                |> Effect.set Effect.none
+
         CopyLink linkUrl ->
             loadedModel
                 |> setCopyButtonClicked True
@@ -392,6 +400,11 @@ setCopyButtonClicked copyButtonClicked model =
 setShowInfoPanel : Bool -> LoadedModel -> LoadedModel
 setShowInfoPanel showInfoPanel model =
     { model | showInfoPanel = showInfoPanel }
+
+
+setShowSharePanel : Bool -> LoadedModel -> LoadedModel
+setShowSharePanel showSharePanel model =
+    { model | showSharePanel = showSharePanel }
 
 
 handleClear : LoadedModel -> List Coordinate -> ( LoadedModel, Effect Msg )
@@ -642,7 +655,7 @@ viewCrossword loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel)
+                |> Build.add (viewGridContainer highlightedCoordinates loadedModel)
                 |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
     in
     div attributes children
@@ -673,8 +686,8 @@ viewInfo crossword =
     div attributes children
 
 
-viewGridContainer : List Coordinate -> Maybe Clue -> LoadedModel -> Html Msg
-viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel =
+viewGridContainer : List Coordinate -> LoadedModel -> Html Msg
+viewGridContainer highlightedCoordinates loadedModel =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
@@ -683,7 +696,7 @@ viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewHeader maybeHighlightedClue loadedModel.showInfoPanel)
+                |> Build.add (viewHeader loadedModel.crossword.series loadedModel.showInfoPanel loadedModel.showSharePanel)
                 |> Build.add (viewCrosswordGrid highlightedCoordinates loadedModel)
                 |> Build.add (viewButtons loadedModel)
     in
@@ -786,61 +799,121 @@ viewButtons loadedModel =
     div attributes children
 
 
-viewHeader : Maybe Clue -> Bool -> Html Msg
-viewHeader clue showInfoPanel =
+viewHeader : String -> Bool -> Bool -> Html Msg
+viewHeader series showInfoPanel showSharePanel =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "header" ]
+            [ id "header", class "crossword-header" ]
 
         children : List (Html Msg)
         children =
             []
-                |> Build.add viewHomeButton
-                |> Build.addMaybeMap viewCurrentClue clue
-                |> Build.add (viewInfoButton showInfoPanel)
+                |> Build.add (viewHeaderLeft series)
+                |> Build.add (viewHeaderRight showInfoPanel showSharePanel)
     in
     div attributes children
 
 
-viewHomeButton : Html Msg
-viewHomeButton =
+viewHeaderLeft : String -> Html Msg
+viewHeaderLeft series =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "home-button" ]
-                |> Build.add (class "fas fa-home")
-                |> Build.add (href "/")
+            [ class "header-left" ]
 
         children : List (Html Msg)
         children =
             []
+                |> Build.add viewHeaderFavicon
+                |> Build.add (viewHeaderTitle series)
+    in
+    div attributes children
+
+
+viewHeaderFavicon : Html Msg
+viewHeaderFavicon =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header-favicon", href "/" ]
+
+        children : List (Html Msg)
+        children =
+            [ text "A" ]
     in
     a attributes children
+
+
+viewHeaderTitle : String -> Html Msg
+viewHeaderTitle series =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header-title" ]
+
+        children : List (Html Msg)
+        children =
+            [ text (Util.String.capitalizeFirstLetter series) ]
+    in
+    div attributes children
+
+
+viewHeaderRight : Bool -> Bool -> Html Msg
+viewHeaderRight showInfoPanel showSharePanel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header-right" ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add (viewInfoButton showInfoPanel)
+                |> Build.add (viewShareButton showSharePanel)
+    in
+    div attributes children
 
 
 viewInfoButton : Bool -> Html Msg
 viewInfoButton showInfoPanel =
     let
-        baseClasses : String
-        baseClasses =
-            if showInfoPanel then
-                "fas fa-info-circle active"
-
-            else
-                "fas fa-info-circle"
-
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "info-button" ]
-                |> Build.add (class baseClasses)
-                |> Build.add (onClick (CrosswordUpdated ToggleInfo))
+            [ class "header-button", onClick (CrosswordUpdated ToggleInfo) ]
+                |> Build.addIf showInfoPanel (class "active")
 
         children : List (Html Msg)
         children =
-            []
+            [ span [ class "icon-info" ] [ text "i" ] ]
     in
-    i attributes children
+    button attributes children
+
+
+viewShareButton : Bool -> Html Msg
+viewShareButton showSharePanel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header-button", onClick (CrosswordUpdated ToggleShare) ]
+                |> Build.addIf showSharePanel (class "active")
+
+        children : List (Html Msg)
+        children =
+            [ span [ class "icon-share" ]
+                [ Html.node "svg"
+                    [ Html.Attributes.attribute "viewBox" "0 0 448 512"
+                    , Html.Attributes.attribute "xmlns" "http://www.w3.org/2000/svg"
+                    ]
+                    [ Html.node "path"
+                        [ Html.Attributes.attribute "d" "M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z"
+                        ]
+                        []
+                    ]
+                ]
+            ]
+    in
+    button attributes children
 
 
 viewInfoPanel : LoadedModel -> Html Msg
@@ -894,22 +967,6 @@ viewInfoPanel loadedModel =
                             ]
                         ]
                     )
-    in
-    div attributes children
-
-
-viewCurrentClue : Clue -> Html Msg
-viewCurrentClue clue =
-    let
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ id "current-clue" ]
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add (text (Clue.getNumberString clue ++ " "))
-                |> Build.concat (viewClueText clue)
     in
     div attributes children
 
