@@ -32,18 +32,19 @@
         }
 
         .boxes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(0, 700px));
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
-            width: max-content;
+            width: fit-content;
             max-width: 100%;
         }
 
         .box {
+            flex: 0 1 700px;
+            min-width: 0;
             background-color: #fff3e0;
             border: 2px solid #ff9800;
             padding: 20px;
-            min-width: 0;
         }
     </style>
 </head>
