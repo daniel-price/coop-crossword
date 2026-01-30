@@ -134,7 +134,6 @@ body {
   gap: var(--spacing-md);
   width: 100%;
   box-sizing: border-box;
-  min-width: 100%;
 }
 
 .header-left {
