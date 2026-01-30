@@ -384,8 +384,6 @@ body {
   flex-direction: column;
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
-  width: min(99vw, 800px);
-  flex: 0 0 auto;
   max-height: 80vh;
   overflow-y: auto;
   padding: var(--spacing-sm);
