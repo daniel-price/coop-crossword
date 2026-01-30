@@ -74,6 +74,8 @@ body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 #input {
@@ -91,6 +93,7 @@ body {
   width: min(99vw, 800px);
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 }
 
 #crossword-grid {
@@ -374,6 +377,7 @@ body {
   max-height: 80vh;
   overflow-y: auto;
   padding: var(--spacing-sm);
+  margin: 0 auto;
 }
 
 .clue-title {
