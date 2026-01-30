@@ -117,13 +117,9 @@ body {
   border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--spacing-lg);
   gap: var(--spacing-md);
-  width: 100vw;
+  width: 100%;
   box-sizing: border-box;
   flex-basis: 100%;
-  margin-left: calc(-1 * min(0.5vw, 3px));
-  margin-right: calc(-1 * min(0.5vw, 3px));
-  padding-left: calc(var(--spacing-md) + min(0.5vw, 3px));
-  padding-right: calc(var(--spacing-md) + min(0.5vw, 3px));
 }
 
 .header-left {
