@@ -5,80 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Layout</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .container {
+        .crossword-page {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
         }
 
         .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: fit-content;
+            display: inline-grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 700px));
+            gap: 20px;
             max-width: 100%;
         }
 
         header {
-            background-color: #e0e0e0;
             border: 2px solid #333;
-            padding: 20px;
-            width: 100%;
+            grid-column: 1 / -1;
         }
 
-        .boxes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(0, 700px));
-            gap: 20px;
-            width: 100%;
+        .crossword-container {
+            display: contents;
         }
 
-        .box {
-            background-color: #f0f0f0;
+        .crossword-part {
             border: 2px solid #666;
-            padding: 20px;
-            min-width: 0;
-            width: 100%;
-            max-width: 700px;
-        }
-
-        .box-1 {
-            background-color: #e8f4f8;
-        }
-
-        .box-2 {
-            background-color: #f8e8f0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="crossword-page">
         <div class="content-wrapper">
             <header>
                 <h1>HEADER</h1>
             </header>
-            <div class="boxes-container">
-                <div class="box box-1">
+            <div class="crossword-container">
+                <div class="crossword-part">
                     <h2>BOX 1</h2>
                     <p>This is Box 1 with a maximum width of 700px. It's responsive and will shrink on smaller screens.</p>
                 </div>
-                <div class="box box-2">
+                <div class="crossword-part">
                     <h2>BOX 2</h2>
                     <p>This is Box 2 with the same width as Box 1. It will stack below Box 1 when there's not enough room.</p>
                 </div>
