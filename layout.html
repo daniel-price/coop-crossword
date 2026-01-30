@@ -21,12 +21,18 @@
         }
 
         .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .content-wrapper {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(min(100%, 700px), 1fr));
             gap: 20px;
             width: 100%;
             max-width: 1420px;
-            justify-content: center;
         }
 
         header {
@@ -60,17 +66,19 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>HEADER</h1>
-        </header>
-        <div class="boxes-container">
-            <div class="box box-1">
-                <h2>BOX 1</h2>
-                <p>This is Box 1 with a maximum width of 700px. It's responsive and will shrink on smaller screens.</p>
-            </div>
-            <div class="box box-2">
-                <h2>BOX 2</h2>
-                <p>This is Box 2 with the same width as Box 1. It will stack below Box 1 when there's not enough room.</p>
+        <div class="content-wrapper">
+            <header>
+                <h1>HEADER</h1>
+            </header>
+            <div class="boxes-container">
+                <div class="box box-1">
+                    <h2>BOX 1</h2>
+                    <p>This is Box 1 with a maximum width of 700px. It's responsive and will shrink on smaller screens.</p>
+                </div>
+                <div class="box box-2">
+                    <h2>BOX 2</h2>
+                    <p>This is Box 2 with the same width as Box 1. It will stack below Box 1 when there's not enough room.</p>
+                </div>
             </div>
         </div>
     </div>
