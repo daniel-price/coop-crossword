@@ -84,10 +84,6 @@ body {
   flex-direction: row;
 }
 
-#header {
-  flex-basis: 100%;
-  box-sizing: border-box;
-}
 
 
 #input {
@@ -134,7 +130,9 @@ body {
   border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--spacing-lg);
   gap: var(--spacing-md);
-  width: 100%;
+  flex-basis: 100%;
+  min-width: 0;
+  max-width: calc(min(99vw, 700px) + min(99vw, 800px) + var(--spacing-xl));
   box-sizing: border-box;
 }
 
