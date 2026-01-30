@@ -75,13 +75,16 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .content-wrapper {
-  display: inline-grid;
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 700px));
   gap: 20px;
   max-width: 100%;
+  width: 100%;
+  justify-content: center;
 }
 
 .crossword-container {
@@ -107,6 +110,8 @@ body {
   display: flex;
   flex-direction: column;
   margin: 0;
+  max-width: 100%;
+  min-width: 0;
 }
 
 #crossword-grid {
@@ -389,6 +394,8 @@ body {
   padding: var(--spacing-sm);
   margin: 0;
   min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 .clue-title {
