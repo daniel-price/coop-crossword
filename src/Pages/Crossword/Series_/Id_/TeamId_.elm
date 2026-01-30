@@ -10,7 +10,7 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, input, span, text)
+import Html exposing (Attribute, Html, a, button, div, i, input, span, text)
 import Html.Attributes exposing (class, href, id, style, value)
 import Html.Events exposing (on, onClick, targetValue)
 import Html.Parser
@@ -855,7 +855,7 @@ viewInfoButton showInfoPanel =
 
         children : List (Html Msg)
         children =
-            [ span [ class "icon-info" ] [ text "i" ] ]
+            [ i [ class "fas fa-circle-info" ] [] ]
     in
     button attributes children
 

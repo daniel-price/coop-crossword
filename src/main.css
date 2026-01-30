@@ -192,19 +192,8 @@ body {
   color: white;
 }
 
-.icon-info {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  font-style: normal;
-  line-height: 1;
+.header-button .fas {
+  font-size: 1.2em;
 }
 
 .icon-share {
@@ -780,12 +769,6 @@ body {
     font-size: var(--font-lg);
   }
 
-  .icon-info {
-    width: 20px;
-    height: 20px;
-    border-width: 1.5px;
-    font-size: 12px;
-  }
 
   .icon-share {
     width: 20px;
