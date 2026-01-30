@@ -804,7 +804,7 @@ viewHeader showInfoPanel showSharePanel =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "header", class "crossword-header" ]
+            [ id "header" ]
 
         children : List (Html Msg)
         children =
