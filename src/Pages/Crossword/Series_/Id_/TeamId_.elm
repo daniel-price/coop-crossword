@@ -650,14 +650,18 @@ viewCrossword loadedModel =
 
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "crossword" ]
+            [ class "crossword-page" ]
 
         children : List (Html Msg)
         children =
-            []
-                |> Build.add (viewHeader loadedModel.showInfoPanel loadedModel.showSharePanel)
-                |> Build.add (viewGridContainer highlightedCoordinates loadedModel)
-                |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
+            [ div [ class "content-wrapper" ]
+                [ viewHeader loadedModel.showInfoPanel loadedModel.showSharePanel
+                , div [ class "crossword-container" ]
+                    [ viewGridContainer highlightedCoordinates loadedModel
+                    , viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues
+                    ]
+                ]
+            ]
     in
     div attributes children
 

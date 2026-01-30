@@ -71,17 +71,25 @@ body {
   z-index: -1;
 }
 
-#crossword {
-  display: inline-flex;
-  flex-wrap: wrap;
-  padding: 0;
-  gap: var(--spacing-xl);
-  font-size: min(1vw, 6px);
-  width: max-content;
+.crossword-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-wrapper {
+  display: inline-grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 700px));
+  gap: 20px;
   max-width: 100%;
-  margin: 0 auto;
-  align-items: flex-start;
-  flex-direction: row;
+}
+
+.crossword-container {
+  display: contents;
+}
+
+.crossword-page {
+  font-size: min(1vw, 6px);
 }
 
 #input {
@@ -96,8 +104,6 @@ body {
 }
 
 #grid-container {
-  flex: 0 1 700px;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -127,9 +133,7 @@ body {
   border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--spacing-lg);
   gap: var(--spacing-md);
-  flex-basis: 100%;
-  min-width: 0;
-  max-width: calc(min(99vw, 700px) + min(99vw, 800px) + var(--spacing-xl));
+  grid-column: 1 / -1;
   box-sizing: border-box;
 }
 
@@ -716,7 +720,7 @@ body {
 }
 
 /* Crossword Loading States */
-#crossword .loading-text {
+.loading-text {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -726,7 +730,7 @@ body {
   position: relative;
 }
 
-#crossword .loading-text::after {
+.loading-text::after {
   content: "";
   width: 16px;
   height: 16px;
