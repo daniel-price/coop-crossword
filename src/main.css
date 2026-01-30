@@ -75,13 +75,13 @@ body {
   display: inline-flex;
   flex-wrap: wrap;
   padding: 0;
-  gap: 0;
+  gap: var(--spacing-xl);
   font-size: min(1vw, 6px);
   width: max-content;
   max-width: 100%;
   margin: 0 auto;
   align-items: flex-start;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 #header {
@@ -91,10 +91,6 @@ body {
   max-width: 100%;
 }
 
-#grid-container,
-#clues {
-  flex-shrink: 0;
-}
 
 #input {
   position: absolute;
@@ -109,10 +105,10 @@ body {
 
 #grid-container {
   width: min(99vw, 700px);
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   margin: 0;
-  flex-shrink: 0;
   min-width: 0;
 }
 
@@ -392,13 +388,12 @@ body {
   flex-direction: column;
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
-  width: min(99vw, 700px);
-  max-width: 800px;
+  width: min(99vw, 800px);
+  flex: 0 0 auto;
   max-height: 80vh;
   overflow-y: auto;
   padding: var(--spacing-sm);
   margin: 0;
-  flex-shrink: 0;
   min-width: 0;
 }
 
