@@ -73,16 +73,17 @@ body {
   padding: 0;
   gap: 0;
   font-size: min(1vw, 6px);
-  width: fit-content;
+  width: max-content;
   max-width: 100%;
   margin: 0 auto;
   align-items: flex-start;
 }
 
 #header {
-  flex: 1 0 100%;
+  flex-basis: 100%;
+  width: 100%;
   box-sizing: border-box;
-  min-width: 0;
+  min-width: max-content;
 }
 
 #grid-container,
