@@ -46,6 +46,8 @@
 
   /* Accent Colors */
   --accent-teal: #14b8a6;
+
+  --max-grid-width: 700px;
 }
 
 body {
@@ -71,11 +73,11 @@ body {
   padding: min(0.5vw, 3px);
   gap: 1em;
   font-size: min(1vw, 6px);
-  width: 100%;
-  max-width: 1400px;
   margin: 0 auto;
   justify-content: center;
   align-items: flex-start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 #input {
@@ -90,7 +92,7 @@ body {
 }
 
 #grid-container {
-  width: min(99vw, 800px);
+  width: min(99vw, var(--max-grid-width));
   display: flex;
   flex-direction: column;
   margin: 0 auto;
@@ -373,7 +375,7 @@ body {
   flex-direction: column;
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
-  width: min(99vw, 800px);
+  width: min(99vw, var(--max-grid-width));
   max-width: 800px;
   max-height: 80vh;
   overflow-y: auto;
