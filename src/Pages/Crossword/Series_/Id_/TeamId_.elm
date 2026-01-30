@@ -655,7 +655,7 @@ viewCrossword loadedModel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewHeader loadedModel.crossword.series loadedModel.showInfoPanel loadedModel.showSharePanel)
+                |> Build.add (viewHeader loadedModel.showInfoPanel loadedModel.showSharePanel)
                 |> Build.add (viewGridContainer highlightedCoordinates loadedModel)
                 |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
     in
@@ -799,8 +799,8 @@ viewButtons loadedModel =
     div attributes children
 
 
-viewHeader : String -> Bool -> Bool -> Html Msg
-viewHeader series showInfoPanel showSharePanel =
+viewHeader : Bool -> Bool -> Html Msg
+viewHeader showInfoPanel showSharePanel =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
@@ -809,24 +809,8 @@ viewHeader series showInfoPanel showSharePanel =
         children : List (Html Msg)
         children =
             []
-                |> Build.add (viewHeaderLeft series)
-                |> Build.add (viewHeaderRight showInfoPanel showSharePanel)
-    in
-    div attributes children
-
-
-viewHeaderLeft : String -> Html Msg
-viewHeaderLeft series =
-    let
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ class "header-left" ]
-
-        children : List (Html Msg)
-        children =
-            []
                 |> Build.add viewHeaderFavicon
-                |> Build.add (viewHeaderTitle series)
+                |> Build.add (viewHeaderRight showInfoPanel showSharePanel)
     in
     div attributes children
 
@@ -843,20 +827,6 @@ viewHeaderFavicon =
             [ text "A" ]
     in
     a attributes children
-
-
-viewHeaderTitle : String -> Html Msg
-viewHeaderTitle series =
-    let
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ class "header-title" ]
-
-        children : List (Html Msg)
-        children =
-            [ text (Util.String.capitalizeFirstLetter series) ]
-    in
-    div attributes children
 
 
 viewHeaderRight : Bool -> Bool -> Html Msg
