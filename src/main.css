@@ -71,7 +71,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   padding: min(0.5vw, 3px);
-  gap: 1em;
+  gap: 0;
   font-size: min(1vw, 6px);
   margin: 0 auto;
   justify-content: center;
