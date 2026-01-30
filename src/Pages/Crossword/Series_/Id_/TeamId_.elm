@@ -749,16 +749,16 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonCheckModel
                         , initial =
                             { text = "Check"
-                            , color = "#2b945a"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated Check
                             }
                         , clicked =
                             { text = "Check All"
-                            , color = "#006400"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated CheckAll
                             }
                         , toParentMsg = CountdownButtonCheckMsg >> CrosswordUpdated
-                        , additionalAttributes = [ class "button" ]
+                        , additionalAttributes = [ class "button button-primary" ]
                         }
                     )
                 |> Build.addIf shouldShowCheckAndReveal
@@ -766,16 +766,16 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonRevealModel
                         , initial =
                             { text = "Reveal"
-                            , color = "#4078c0"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated Reveal
                             }
                         , clicked =
                             { text = "Reveal All"
-                            , color = "#174175"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated RevealAll
                             }
                         , toParentMsg = CountdownButtonRevealMsg >> CrosswordUpdated
-                        , additionalAttributes = [ class "button" ]
+                        , additionalAttributes = [ class "button button-secondary" ]
                         }
                     )
                 |> Build.add
@@ -783,16 +783,16 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonClearModel
                         , initial =
                             { text = "Clear"
-                            , color = "#db3535"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated Clear
                             }
                         , clicked =
                             { text = "Clear All"
-                            , color = "#9c1f1f"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated ClearAll
                             }
                         , toParentMsg = CountdownButtonClearMsg >> CrosswordUpdated
-                        , additionalAttributes = [ class "button" ]
+                        , additionalAttributes = [ class "button button-secondary" ]
                         }
                     )
     in

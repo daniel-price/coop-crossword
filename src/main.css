@@ -434,14 +434,30 @@ body {
   text-align: center;
   justify-content: center;
   font-size: var(--crossword-font-4xl);
-  color: white;
   padding: var(--spacing-sm) var(--spacing-md);
   min-width: 6em;
   height: 2.5em;
 }
 
-.button:hover {
+.button-primary {
+  background-color: var(--text-primary);
+  color: white;
+  border-color: var(--text-primary);
+}
+
+.button-primary:hover {
   box-shadow: var(--shadow-md);
+}
+
+.button-secondary {
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.button-secondary:hover {
+  box-shadow: var(--shadow-md);
+  background-color: var(--background-color);
 }
 
 #info {
