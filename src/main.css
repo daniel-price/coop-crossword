@@ -156,7 +156,7 @@ body {
 }
 
 .header-favicon:hover {
-  background: var(--accent-teal);
+  background: var(--text-primary);
   transform: scale(1.05);
 }
 
