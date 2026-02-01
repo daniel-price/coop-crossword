@@ -249,9 +249,9 @@ body {
   background-color: var(--surface-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
+  max-width: 900px;
+  width: 95%;
+  max-height: 85vh;
   overflow-y: auto;
   z-index: 1001;
 }
