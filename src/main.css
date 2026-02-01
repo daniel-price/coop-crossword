@@ -386,7 +386,7 @@ body {
 
 #clues {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
   max-height: 80vh;
@@ -396,6 +396,11 @@ body {
   min-width: 0;
   max-width: 100%;
   width: 100%;
+}
+
+.clues-list {
+  flex: 1;
+  min-width: 0;
 }
 
 .clue-title {
