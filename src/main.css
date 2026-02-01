@@ -533,41 +533,126 @@ body {
 .home-header {
   text-align: center;
   margin-bottom: var(--spacing-2xl);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .home-title {
   font-size: var(--font-5xl);
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
   letter-spacing: -0.025em;
 }
 
 .home-subtitle {
+  font-size: var(--font-xl);
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+}
+
+.home-description {
+  margin-top: var(--spacing-xl);
+  text-align: left;
+}
+
+.description-text {
   font-size: var(--font-lg);
   color: var(--text-secondary);
-  font-weight: 400;
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.home-features {
+  margin: var(--spacing-2xl) 0;
+  padding: var(--spacing-2xl) 0;
+}
+
+.features-title {
+  font-size: var(--font-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.feature-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  border-color: var(--primary-color);
+}
+
+.feature-heading {
+  font-size: var(--font-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.feature-text {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.crosswords-section {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-2xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.crosswords-title {
+  font-size: var(--font-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
 }
 
 #crosswords {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--spacing-xl);
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
 }
 
 .series {
   background: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
 }
 
 .series:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  border-color: var(--primary-color);
 }
 
 .header {
@@ -582,7 +667,7 @@ body {
 .header h2 {
   font-size: var(--font-2xl);
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--text-primary);
   margin: 0;
   text-transform: capitalize;
 }
@@ -620,14 +705,15 @@ body {
 
 .link a {
   display: block;
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   text-decoration: none;
   color: var(--text-primary);
   border-radius: var(--radius-md);
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
   transition: all 0.15s ease-in-out;
   font-weight: 500;
   font-size: var(--font-base);
+  background-color: var(--background-color);
 }
 
 .link a:hover {
@@ -635,6 +721,7 @@ body {
   color: white;
   border-color: var(--primary-color);
   transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Skeleton Loading Styles */
@@ -777,6 +864,31 @@ body {
 
   .home-title {
     font-size: var(--font-4xl);
+  }
+
+  .home-subtitle {
+    font-size: var(--font-lg);
+  }
+
+  .description-text {
+    font-size: var(--font-base);
+  }
+
+  .features-title {
+    font-size: var(--font-2xl);
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .feature-card {
+    padding: var(--spacing-lg);
+  }
+
+  .crosswords-title {
+    font-size: var(--font-2xl);
   }
 
   #crosswords {

@@ -2,7 +2,7 @@ module Pages.Home_ exposing (LoadedModel, Model, Msg, page)
 
 import Data.CrosswordInfo as CrosswordInfo exposing (CrosswordInfo)
 import Effect exposing (Effect)
-import Html exposing (Html, a, div, h1, h2, p, text)
+import Html exposing (Html, a, div, h1, h2, h3, p, section, text)
 import Html.Attributes exposing (class, href, id)
 import Page exposing (Page)
 import RemoteData exposing (RemoteData(..), WebData)
@@ -77,11 +77,33 @@ view sharedModel model =
     { title = "All Clued In"
     , body =
         [ div [ class "home-container" ]
-            (div [ class "home-header" ]
+            ([ div [ class "home-header" ]
                 [ h1 [ class "home-title" ] [ text "All Clued In" ]
-                , p [ class "home-subtitle" ] [ text "Choose a crossword and share the link to solve it with your friends" ]
+                , p [ class "home-subtitle" ] [ text "Solve crosswords together with friends in real-time" ]
+                , div [ class "home-description" ]
+                    [ p [ class "description-text" ]
+                        [ text "Welcome to All Clued In! This is a collaborative crossword platform where you can solve puzzles together with friends. Share a link, and everyone can work on the same crossword simultaneously, seeing each other's progress in real-time." ]
+                    ]
                 ]
-                :: (case model of
+            , section [ class "home-features" ]
+                [ h2 [ class "features-title" ] [ text "How it works" ]
+                , div [ class "features-grid" ]
+                    [ div [ class "feature-card" ]
+                        [ h3 [ class "feature-heading" ] [ text "Choose a Crossword" ]
+                        , p [ class "feature-text" ] [ text "Browse our collection of crosswords organized by series. Pick one that interests you and your friends." ]
+                        ]
+                    , div [ class "feature-card" ]
+                        [ h3 [ class "feature-heading" ] [ text "Share the Link" ]
+                        , p [ class "feature-text" ] [ text "Copy the link and share it with your friends. Each link creates a unique collaborative session." ]
+                        ]
+                    , div [ class "feature-card" ]
+                        [ h3 [ class "feature-heading" ] [ text "Solve Together" ]
+                        , p [ class "feature-text" ] [ text "Work on the same crossword simultaneously. See each other's letters appear in real-time as you solve together." ]
+                        ]
+                    ]
+                ]
+            ]
+                ++ (case model of
                         NotAsked ->
                             [ viewSkeletonLoading ]
 
@@ -92,11 +114,14 @@ view sharedModel model =
                             [ div [ class "error-state" ] [ text "Failed to load crosswords. Please try again later." ] ]
 
                         Success { crosswordInfos } ->
-                            [ div [ id "crosswords" ]
-                                (crosswordInfos
-                                    |> splitBySeries
-                                    |> List.map (viewSeries sharedModel.teamId)
-                                )
+                            [ section [ class "crosswords-section" ]
+                                [ h2 [ class "crosswords-title" ] [ text "Available Crosswords" ]
+                                , div [ id "crosswords" ]
+                                    (crosswordInfos
+                                        |> splitBySeries
+                                        |> List.map (viewSeries sharedModel.teamId)
+                                    )
+                                ]
                             ]
                    )
             )
