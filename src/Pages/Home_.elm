@@ -85,7 +85,7 @@ view sharedModel model =
                         [ text "Welcome to All Clued In! This is a collaborative crossword platform where you can solve puzzles together with friends. Share a link, and everyone can work on the same crossword simultaneously, seeing each other's progress in real-time." ]
                     ]
                 ]
-            , section [ class "home-features" ]
+             , section [ class "home-features" ]
                 [ h2 [ class "features-title" ] [ text "How it works" ]
                 , div [ class "features-grid" ]
                     [ div [ class "feature-card" ]
@@ -102,7 +102,7 @@ view sharedModel model =
                         ]
                     ]
                 ]
-            ]
+             ]
                 ++ (case model of
                         NotAsked ->
                             [ viewSkeletonLoading ]
@@ -114,14 +114,11 @@ view sharedModel model =
                             [ div [ class "error-state" ] [ text "Failed to load crosswords. Please try again later." ] ]
 
                         Success { crosswordInfos } ->
-                            [ section [ class "crosswords-section" ]
-                                [ h2 [ class "crosswords-title" ] [ text "Available Crosswords" ]
-                                , div [ id "crosswords" ]
-                                    (crosswordInfos
-                                        |> splitBySeries
-                                        |> List.map (viewSeries sharedModel.teamId)
-                                    )
-                                ]
+                            [ div [ id "crosswords" ]
+                                (crosswordInfos
+                                    |> splitBySeries
+                                    |> List.map (viewSeries sharedModel.teamId)
+                                )
                             ]
                    )
             )

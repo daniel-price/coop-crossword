@@ -10,9 +10,9 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, i, img, input, text)
+import Html exposing (Attribute, Html, a, button, div, h2, i, img, input, text)
 import Html.Attributes exposing (alt, class, href, id, src, style, value)
-import Html.Events exposing (on, onClick, targetValue)
+import Html.Events exposing (custom, on, onClick, targetValue)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as JD
@@ -105,7 +105,6 @@ type CrosswordUpdatedMsg
       -- Info panel
     | ToggleInfo
     | ToggleShare
-    | CopyLink String
 
 
 type Msg
@@ -386,16 +385,6 @@ updateCrossword msg loadedModel =
                 |> setShowSharePanel (not loadedModel.showSharePanel)
                 |> Effect.set Effect.none
 
-        CopyLink linkUrl ->
-            loadedModel
-                |> setCopyButtonClicked True
-                |> Effect.set (Effect.copyToClipboard linkUrl)
-
-
-setCopyButtonClicked : Bool -> LoadedModel -> LoadedModel
-setCopyButtonClicked copyButtonClicked model =
-    { model | copyButtonClicked = copyButtonClicked }
-
 
 setShowInfoPanel : Bool -> LoadedModel -> LoadedModel
 setShowInfoPanel showInfoPanel model =
@@ -660,6 +649,7 @@ viewCrossword loadedModel =
                     [ viewGridContainer highlightedCoordinates loadedModel
                     , viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues
                     ]
+                , viewInfoModal loadedModel
                 ]
             ]
     in
@@ -719,15 +709,11 @@ viewCrosswordGrid highlightedCoordinates loadedModel =
             []
                 |> Build.add
                     (Grid.view
-                        ([ id "grid" ]
-                            |> Build.addIf loadedModel.showInfoPanel (class "hidden")
-                        )
+                        [ id "grid" ]
                         [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ]
                         (viewCell highlightedCoordinates loadedModel)
                         loadedModel.crossword.grid
                     )
-                |> Build.add
-                    (viewInfoPanel loadedModel)
     in
     div attributes children
 
@@ -884,59 +870,47 @@ viewShareButton showSharePanel =
     button attributes children
 
 
-viewInfoPanel : LoadedModel -> Html Msg
-viewInfoPanel loadedModel =
+viewInfoModal : LoadedModel -> Html Msg
+viewInfoModal loadedModel =
     let
         crossword : Crossword
         crossword =
             loadedModel.crossword
 
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ id "info-panel" ]
+        backdropAttributes : List (Html.Attribute Msg)
+        backdropAttributes =
+            [ class "modal-backdrop" ]
                 |> Build.addIf (not loadedModel.showInfoPanel) (class "hidden")
+                |> Build.add (onClick (CrosswordUpdated ToggleInfo))
 
-        linkUrl : String
-        linkUrl =
-            "allcluedin.com/crossword/" ++ crossword.series ++ "/" ++ crossword.seriesNo ++ "/" ++ loadedModel.teamId
+        modalAttributes : List (Html.Attribute Msg)
+        modalAttributes =
+            [ class "info-modal"
+            , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
+            ]
+                |> Build.addIf (not loadedModel.showInfoPanel) (class "hidden")
 
         children : List (Html Msg)
         children =
             []
                 |> Build.add
-                    (div [ class "info-panel-content" ]
-                        [ viewInfo crossword
-                        , div [ class "info-details" ]
-                            [ div [ class "info-item" ]
-                                [ div [ class "share-section" ]
-                                    [ input [ class "share-input", value linkUrl, id "share-link" ] []
-                                    , button
-                                        [ class
-                                            ("copy-button"
-                                                ++ (if loadedModel.copyButtonClicked then
-                                                        " copy-success"
-
-                                                    else
-                                                        ""
-                                                   )
-                                            )
-                                        , onClick (CrosswordUpdated (CopyLink linkUrl))
-                                        ]
-                                        [ text
-                                            (if loadedModel.copyButtonClicked then
-                                                "Copied!"
-
-                                             else
-                                                "Copy Link"
-                                            )
-                                        ]
-                                    ]
+                    (div [ class "info-modal-content" ]
+                        [ div [ class "info-modal-header" ]
+                            [ h2 [ class "info-modal-title" ] [ text "Crossword Information" ]
+                            , button
+                                [ class "info-modal-close"
+                                , onClick (CrosswordUpdated ToggleInfo)
                                 ]
+                                [ i [ class "fas fa-times" ] [] ]
+                            ]
+                        , div [ class "info-modal-body" ]
+                            [ viewInfo crossword
                             ]
                         ]
                     )
     in
-    div attributes children
+    div backdropAttributes
+        [ div modalAttributes children ]
 
 
 {-| Have an input floating on top of the grid so that the user can type.
