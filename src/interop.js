@@ -28,6 +28,10 @@ export const onReady = ({ app, env }) => {
           copyToClipboard(data);
           return;
 
+        case "SHARE_LINK":
+          shareLink(app, data);
+          return;
+
         default:
           console.warn(`Unhandled outgoing port: "${tag}"`);
           return;
@@ -65,6 +69,49 @@ function copyToClipboard(text) {
         window.elmApp.ports.messageReceiver.send(false);
       }
     });
+}
+
+function shareLink(app, data) {
+  const { url, title, text } = data;
+  
+  // Check if Web Share API is available
+  if (navigator.share) {
+    navigator
+      .share({
+        title: title || "Crossword Link",
+        text: text || "Check out this crossword!",
+        url: url,
+      })
+      .then(() => {
+        console.log("Link shared successfully");
+        // Send success feedback to Elm - no need to show fallback
+        if (app.ports && app.ports.messageReceiver) {
+          app.ports.messageReceiver.send(JSON.stringify({ success: true, showFallback: false }));
+        }
+      })
+      .catch((err) => {
+        // User cancelled or error occurred
+        // Don't show fallback on user cancellation (DOMException with name "AbortError")
+        if (err.name === "AbortError") {
+          console.log("Share cancelled by user");
+          if (app.ports && app.ports.messageReceiver) {
+            app.ports.messageReceiver.send(JSON.stringify({ success: false, showFallback: false }));
+          }
+        } else {
+          console.log("Share failed:", err);
+          // Show fallback UI on actual errors
+          if (app.ports && app.ports.messageReceiver) {
+            app.ports.messageReceiver.send(JSON.stringify({ success: false, showFallback: true }));
+          }
+        }
+      });
+  } else {
+    // Web Share API not available, show fallback UI
+    console.log("Web Share API not available, showing fallback");
+    if (app.ports && app.ports.messageReceiver) {
+      app.ports.messageReceiver.send(JSON.stringify({ success: false, showFallback: true }));
+    }
+  }
 }
 
 function getTeamId() {

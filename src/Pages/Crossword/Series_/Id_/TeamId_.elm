@@ -10,7 +10,7 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, h2, i, img, input, text)
+import Html exposing (Attribute, Html, a, button, div, h2, i, img, input, p, text)
 import Html.Attributes exposing (alt, class, href, id, src, style, value)
 import Html.Events exposing (custom, on, onClick, targetValue)
 import Html.Parser
@@ -105,6 +105,9 @@ type CrosswordUpdatedMsg
       -- Info panel
     | ToggleInfo
     | ToggleShare
+    | ShareLink
+    | ShareResponseReceived String
+    | CopyLink String
 
 
 type Msg
@@ -385,6 +388,51 @@ updateCrossword msg loadedModel =
                 |> setShowSharePanel (not loadedModel.showSharePanel)
                 |> Effect.set Effect.none
 
+        ShareLink ->
+            let
+                linkUrl : String
+                linkUrl =
+                    "https://allcluedin.com/crossword/" ++ loadedModel.crossword.series ++ "/" ++ loadedModel.crossword.seriesNo ++ "/" ++ loadedModel.teamId
+
+                title : String
+                title =
+                    Util.String.capitalizeFirstLetter loadedModel.crossword.series ++ " " ++ loadedModel.crossword.seriesNo
+
+                text : String
+                text =
+                    "Solve this crossword with me: " ++ title
+            in
+            loadedModel
+                |> Effect.set (Effect.shareLink { url = linkUrl, title = title, text = text })
+
+        ShareResponseReceived responseJson ->
+            let
+                showFallback : Bool
+                showFallback =
+                    responseJson
+                        |> JD.decodeString
+                            (JD.field "showFallback" JD.bool)
+                        |> Result.withDefault False
+            in
+            if showFallback then
+                loadedModel
+                    |> setShowSharePanel True
+                    |> Effect.set Effect.none
+
+            else
+                loadedModel
+                    |> Effect.set Effect.none
+
+        CopyLink linkUrl ->
+            loadedModel
+                |> setCopyButtonClicked True
+                |> Effect.set (Effect.copyToClipboard linkUrl)
+
+
+setCopyButtonClicked : Bool -> LoadedModel -> LoadedModel
+setCopyButtonClicked copyButtonClicked model =
+    { model | copyButtonClicked = copyButtonClicked }
+
 
 setShowInfoPanel : Bool -> LoadedModel -> LoadedModel
 setShowInfoPanel showInfoPanel model =
@@ -556,6 +604,7 @@ subscriptions model =
                             CrosswordUpdated (CursorPositionUpdated username coordinate)
                         )
                         NoOp
+                    , Effect.messageReceiver (CrosswordUpdated << ShareResponseReceived)
                     , keyDownSubscription
                     , CountdownButton.subscriptions loadedModel.countdownButtonCheckModel (CountdownButtonCheckMsg >> CrosswordUpdated)
                     , CountdownButton.subscriptions loadedModel.countdownButtonRevealModel (CountdownButtonRevealMsg >> CrosswordUpdated)
@@ -650,6 +699,7 @@ viewCrossword loadedModel =
                     , viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues
                     ]
                 , viewInfoModal loadedModel
+                , viewShareModal loadedModel
                 ]
             ]
     in
@@ -860,7 +910,7 @@ viewShareButton showSharePanel =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ class "header-button", onClick (CrosswordUpdated ToggleShare) ]
+            [ class "header-button", onClick (CrosswordUpdated ShareLink) ]
                 |> Build.addIf showSharePanel (class "active")
 
         children : List (Html Msg)
@@ -905,6 +955,78 @@ viewInfoModal loadedModel =
                             ]
                         , div [ class "info-modal-body" ]
                             [ viewInfo crossword
+                            ]
+                        ]
+                    )
+    in
+    div backdropAttributes
+        [ div modalAttributes children ]
+
+
+viewShareModal : LoadedModel -> Html Msg
+viewShareModal loadedModel =
+    let
+        linkUrl : String
+        linkUrl =
+            "https://allcluedin.com/crossword/" ++ loadedModel.crossword.series ++ "/" ++ loadedModel.crossword.seriesNo ++ "/" ++ loadedModel.teamId
+
+        backdropAttributes : List (Html.Attribute Msg)
+        backdropAttributes =
+            [ class "modal-backdrop" ]
+                |> Build.addIf (not loadedModel.showSharePanel) (class "hidden")
+                |> Build.add (onClick (CrosswordUpdated ToggleShare))
+
+        modalAttributes : List (Html.Attribute Msg)
+        modalAttributes =
+            [ class "share-modal"
+            , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
+            ]
+                |> Build.addIf (not loadedModel.showSharePanel) (class "hidden")
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add
+                    (div [ class "share-modal-content" ]
+                        [ div [ class "share-modal-header" ]
+                            [ h2 [ class "share-modal-title" ] [ text "Share Crossword" ]
+                            , button
+                                [ class "share-modal-close"
+                                , onClick (CrosswordUpdated ToggleShare)
+                                ]
+                                [ i [ class "fas fa-times" ] [] ]
+                            ]
+                        , div [ class "share-modal-body" ]
+                            [ p [ class "share-modal-description" ] [ text "Share this link to solve together:" ]
+                            , div [ class "share-section" ]
+                                [ input
+                                    [ class "share-input"
+                                    , value linkUrl
+                                    , id "share-link"
+                                    , Html.Attributes.readonly True
+                                    ]
+                                    []
+                                , button
+                                    [ class
+                                        ("copy-button"
+                                            ++ (if loadedModel.copyButtonClicked then
+                                                    " copy-success"
+
+                                                else
+                                                    ""
+                                               )
+                                        )
+                                    , onClick (CrosswordUpdated (CopyLink linkUrl))
+                                    ]
+                                    [ text
+                                        (if loadedModel.copyButtonClicked then
+                                            "Copied!"
+
+                                         else
+                                            "Copy Link"
+                                        )
+                                    ]
+                                ]
                             ]
                         ]
                     )

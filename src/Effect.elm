@@ -12,6 +12,9 @@ port module Effect exposing
     , subscribeToCursorPositionUpdates
     , setupFocusInputOnClick
     , sendCursorPositionUpdate
+    , shareLink
+    , messageReceiver
+    , copyToClipboard
     )
 
 {-| This file was generated automatically by running elm-land customize effect
@@ -36,6 +39,9 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs subscribeToCursorPositionUpdates
 @docs setupFocusInputOnClick
 @docs sendCursorPositionUpdate
+@docs shareLink
+@docs messageReceiver
+@docs copyToClipboard
 
 -}
 
@@ -260,6 +266,27 @@ sendWebsocketMessage username messages =
                         ]
                 )
                 messages
+        }
+
+
+shareLink : { url : String, title : String, text : String } -> Effect msg
+shareLink { url, title, text } =
+    SendMessageToJavaScript
+        { tag = "SHARE_LINK"
+        , data =
+            Json.Encode.object
+                [ ( "url", Json.Encode.string url )
+                , ( "title", Json.Encode.string title )
+                , ( "text", Json.Encode.string text )
+                ]
+        }
+
+
+copyToClipboard : String -> Effect msg
+copyToClipboard text =
+    SendMessageToJavaScript
+        { tag = "COPY_TO_CLIPBOARD"
+        , data = Json.Encode.string text
         }
 
 
