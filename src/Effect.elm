@@ -356,6 +356,9 @@ subscribeToCursorPositionUpdates : (String -> Coordinate -> msg) -> msg -> Sub m
 subscribeToCursorPositionUpdates successMsg failureMsg =
     messageReceiver
         (\string ->
+            -- Try to decode as cursor position update
+            -- Cursor position messages are objects with x, y, and user/modified_by
+            -- Filled letters messages are arrays, so they won't match this decoder
             case
                 Json.Decode.decodeString
                     (Json.Decode.map3
@@ -364,7 +367,11 @@ subscribeToCursorPositionUpdates successMsg failureMsg =
                         )
                         (Json.Decode.field "x" Json.Decode.int)
                         (Json.Decode.field "y" Json.Decode.int)
-                        (Json.Decode.field "user" Json.Decode.string)
+                        (Json.Decode.oneOf
+                            [ Json.Decode.field "user" Json.Decode.string
+                            , Json.Decode.field "modified_by" Json.Decode.string
+                            ]
+                        )
                     )
                     string
             of
@@ -372,6 +379,8 @@ subscribeToCursorPositionUpdates successMsg failureMsg =
                     msg
 
                 Err _ ->
+                    -- Not a cursor position message (might be filled letters array or other format)
+                    -- Return failureMsg which will be ignored, allowing other subscriptions to handle it
                     failureMsg
         )
 
