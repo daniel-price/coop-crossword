@@ -758,7 +758,7 @@ viewButtons loadedModel =
                             }
                         , clicked =
                             { text = "Check All"
-                            , color = "#000000"
+                            , color = "#646464"
                             , onClick = CrosswordUpdated CheckAll
                             }
                         , toParentMsg = CountdownButtonCheckMsg >> CrosswordUpdated
@@ -775,7 +775,7 @@ viewButtons loadedModel =
                             }
                         , clicked =
                             { text = "Reveal All"
-                            , color = "#ffffff"
+                            , color = "#bfbfbf"
                             , onClick = CrosswordUpdated RevealAll
                             }
                         , toParentMsg = CountdownButtonRevealMsg >> CrosswordUpdated
@@ -792,7 +792,7 @@ viewButtons loadedModel =
                             }
                         , clicked =
                             { text = "Clear All"
-                            , color = "#ffffff"
+                            , color = "#bfbfbf"
                             , onClick = CrosswordUpdated ClearAll
                             }
                         , toParentMsg = CountdownButtonClearMsg >> CrosswordUpdated
@@ -1198,24 +1198,26 @@ viewClue crossword filledLetters maybeHighlightedClue clue =
         children =
             []
                 |> Build.add (viewClueNumber (Clue.getNumberString clue))
-                |> Build.concat (viewClueText clue)
+                |> Build.add (viewClueText clue)
     in
     div attributes children
 
 
-viewClueText : Clue -> List (Html Msg)
+viewClueText : Clue -> Html Msg
 viewClueText clue =
     let
         clueText : String
         clueText =
             Clue.getText clue
     in
-    case Html.Parser.run clueText of
-        Ok nodes ->
-            Html.Parser.Util.toVirtualDom nodes
+    div [ class "clue-text" ]
+        (case Html.Parser.run clueText of
+            Ok nodes ->
+                Html.Parser.Util.toVirtualDom nodes
 
-        Err _ ->
-            [ text clueText ]
+            Err _ ->
+                [ text clueText ]
+        )
 
 
 viewClueNumber : String -> Html Msg
