@@ -264,14 +264,15 @@ body {
   display: flex;
   flex-direction: column;
   padding: var(--spacing-xl);
+  gap: var(--spacing-md);
 }
 
 .info-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-lg);
   border-bottom: 2px solid var(--border-color);
 }
 
@@ -289,10 +290,10 @@ body {
   font-size: var(--font-xl);
   cursor: pointer;
   padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   transition: all 0.2s ease-in-out;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,12 +302,13 @@ body {
 .info-modal-close:hover {
   background-color: var(--background-color);
   color: var(--text-primary);
+  transform: scale(1.1);
 }
 
 .info-modal-body {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 /* Share modal - same styling as info modal */
@@ -399,31 +401,60 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background-color: var(--background-color);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
+  transition: all 0.2s ease-in-out;
+}
+
+.info-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .info-label {
   font-weight: 600;
   color: var(--text-primary);
   font-size: var(--crossword-font-xl);
+  letter-spacing: 0.01em;
 }
 
 .info-value {
   color: var(--text-secondary);
   font-size: var(--crossword-font-xl);
+  text-align: right;
+  font-weight: 400;
+}
+
+.info-link-container {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
 }
 
 .info-link {
   color: var(--primary-color);
   text-decoration: none;
   font-size: var(--crossword-font-xl);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary-color);
+  background-color: var(--surface-color);
+  transition: all 0.2s ease-in-out;
 }
 
 .info-link:hover {
-  text-decoration: underline;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .info-section-title {

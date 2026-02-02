@@ -10,7 +10,7 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, h2, i, img, input, p, text)
+import Html exposing (Attribute, Html, a, button, div, h2, i, img, input, p, span, text)
 import Html.Attributes exposing (alt, class, href, id, src, style, value)
 import Html.Events exposing (custom, on, onClick, targetValue)
 import Html.Parser
@@ -713,22 +713,41 @@ viewInfo crossword =
         attributes =
             [ id "info" ]
 
-        setByString : String
-        setByString =
-            if crossword.setter == "" then
-                ""
-
-            else
-                " set by " ++ crossword.setter
+        infoItems : List (Html Msg)
+        infoItems =
+            [ viewInfoItem "Series" (Util.String.capitalizeFirstLetter crossword.series)
+            , viewInfoItem "Number" crossword.seriesNo
+            , viewInfoItem "Date" crossword.date
+            ]
+                |> Build.addIf (crossword.setter /= "")
+                    (viewInfoItem "Setter" crossword.setter)
 
         children : List (Html Msg)
         children =
             []
-                |> Build.add (text (Util.String.capitalizeFirstLetter crossword.series ++ " " ++ crossword.seriesNo ++ " - " ++ crossword.date ++ " -" ++ setByString ++ " for "))
                 |> Build.add
-                    (a [ href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo) ] [ text "the Guardian" ])
+                    (div [ class "info-details" ] infoItems)
+                |> Build.add
+                    (div [ class "info-link-container" ]
+                        [ a
+                            [ class "info-link"
+                            , href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo)
+                            ]
+                            [ text "View on The Guardian"
+                            , i [ class "fas fa-external-link-alt", style "margin-left" "0.5em" ] []
+                            ]
+                        ]
+                    )
     in
     div attributes children
+
+
+viewInfoItem : String -> String -> Html Msg
+viewInfoItem label value =
+    div [ class "info-item" ]
+        [ span [ class "info-label" ] [ text label ]
+        , span [ class "info-value" ] [ text value ]
+        ]
 
 
 viewGridContainer : List Coordinate -> LoadedModel -> Html Msg
