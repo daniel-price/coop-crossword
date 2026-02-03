@@ -93,6 +93,7 @@ body {
 
 .crossword-page {
   font-size: min(1vw, 6px);
+  padding: var(--spacing-xs);
 }
 
 #input {
@@ -560,8 +561,6 @@ body {
   font-size: var(--crossword-font-3xl);
   max-height: 80vh;
   overflow-y: auto;
-  padding: var(--spacing-sm);
-  margin: 0;
   min-width: 0;
   max-width: 100%;
   width: 100%;
@@ -570,6 +569,7 @@ body {
 .clues-list {
   flex: 1 1 calc(50% - var(--spacing-lg) / 2);
   min-width: calc(var(--max-grid-width) / 2 - 20px);
+  padding: var(--spacing-xs);
 }
 
 .clue-title {
