@@ -629,6 +629,15 @@ body {
   }
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .button {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
