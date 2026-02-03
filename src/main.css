@@ -47,7 +47,7 @@
   /* Accent Colors */
   --accent-teal: #14b8a6;
 
-  --max-width: 700px;
+  --max-grid-width: 700px;
 }
 
 body {
@@ -80,7 +80,7 @@ body {
 
 .content-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 800px));
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--max-grid-width) / 2), var(--max-grid-width)));
   gap: 20px;
   max-width: 100%;
   width: 100%;
@@ -554,7 +554,8 @@ body {
 
 #clues {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
   max-height: 80vh;
@@ -567,8 +568,8 @@ body {
 }
 
 .clues-list {
-  width: 100%;
-  min-width: 0;
+  flex: 1 1 calc(50% - var(--spacing-lg) / 2);
+  min-width: calc(var(--max-grid-width) / 2 - 20px);
 }
 
 .clue-title {
@@ -767,7 +768,6 @@ body {
 
 .feature-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-4px);
   border-color: var(--primary-color);
 }
 
@@ -819,7 +819,6 @@ body {
 
 .series:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-4px);
   border-color: var(--primary-color);
 }
 
