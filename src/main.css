@@ -571,6 +571,18 @@ body {
   min-width: 0;
 }
 
+/* When in stacked view (clues beneath grid), make clues full width */
+@media (max-width: 600px) {
+  #clues {
+    flex-direction: column;
+  }
+
+  .clues-list {
+    flex: none;
+    width: 100%;
+  }
+}
+
 .clue-title {
   color: var(--primary-color);
   font-weight: 600;
@@ -582,7 +594,6 @@ body {
 
 .clue {
   display: flex;
-  width: 100%;
   padding: var(--spacing-sm);
   gap: var(--spacing-sm);
   font-size: var(--crossword-font-xl);
