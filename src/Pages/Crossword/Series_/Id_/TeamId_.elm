@@ -10,8 +10,8 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, button, div, h2, i, img, input, p, span, text)
-import Html.Attributes exposing (alt, class, href, id, src, style, value)
+import Html exposing (Attribute, Html, a, button, div, h2, i, input, p, span, text)
+import Html.Attributes exposing (class, href, id, style, value)
 import Html.Events exposing (custom, on, onClick, targetValue)
 import Html.Parser
 import Html.Parser.Util
@@ -883,12 +883,7 @@ viewHeaderFavicon =
 
         children : List (Html Msg)
         children =
-            [ img
-                [ src "/favicon.png"
-                , alt "Home"
-                ]
-                []
-            ]
+            [ i [ class "fas fa-home" ] [] ]
     in
     a attributes children
 

@@ -81,7 +81,6 @@ body {
 .content-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(calc(var(--max-grid-width) / 2), var(--max-grid-width)));
-  gap: 20px;
   max-width: 100%;
   width: 100%;
   justify-content: center;
@@ -162,22 +161,13 @@ body {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   border: 1px solid var(--border-color);
-  overflow: hidden;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.header-favicon img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  color: var(--text-primary);
+  font-size: var(--font-xl);
 }
 
 .header-favicon:hover {
   background: var(--text-primary);
+  color: white;
   transform: scale(1.05);
 }
 
