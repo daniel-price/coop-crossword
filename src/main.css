@@ -554,7 +554,7 @@ body {
 
 #clues {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
   max-height: 80vh;
@@ -567,20 +567,8 @@ body {
 }
 
 .clues-list {
-  flex: 1;
+  width: 100%;
   min-width: 0;
-}
-
-/* When in stacked view (clues beneath grid), make clues full width */
-@media (max-width: 600px) {
-  #clues {
-    flex-direction: column;
-  }
-
-  .clues-list {
-    flex: none;
-    width: 100%;
-  }
 }
 
 .clue-title {
