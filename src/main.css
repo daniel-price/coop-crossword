@@ -47,7 +47,7 @@
   /* Accent Colors */
   --accent-teal: #14b8a6;
 
-  --max-grid-width: 700px;
+  --max-grid-width: 600px;
 }
 
 body {
@@ -63,7 +63,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
 }
 
 .hidden {
@@ -81,7 +80,8 @@ body {
 .content-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(calc(var(--max-grid-width) / 2), var(--max-grid-width)));
-  max-width: 100%;
+  max-width: calc(var(--max-grid-width) * 2 + var(--spacing-lg));
+  gap: var(--spacing-lg);
   width: 100%;
   justify-content: center;
 }
@@ -92,7 +92,6 @@ body {
 
 .crossword-page {
   font-size: min(1vw, 6px);
-  padding: var(--spacing-xs);
 }
 
 #input {
@@ -1020,72 +1019,4 @@ body {
   border: 1px solid #fecaca;
   border-radius: var(--radius-sm);
   padding: var(--spacing-lg);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .home-container {
-    padding: var(--spacing-lg);
-  }
-
-  .home-title {
-    font-size: var(--font-4xl);
-  }
-
-  .home-subtitle {
-    font-size: var(--font-lg);
-  }
-
-  .description-text {
-    font-size: var(--font-base);
-  }
-
-  .features-title {
-    font-size: var(--font-2xl);
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-
-  .feature-card {
-    padding: var(--spacing-lg);
-  }
-
-  .crosswords-title {
-    font-size: var(--font-2xl);
-  }
-
-  #crosswords {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
-  }
-
-  .series {
-    padding: var(--spacing-md);
-  }
-
-  #header {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
-    gap: var(--spacing-sm);
-  }
-
-  .header-favicon {
-    width: 32px;
-    height: 32px;
-    font-size: var(--font-lg);
-  }
-
-  .header-title {
-    font-size: var(--font-base);
-  }
-
-  .header-button {
-    width: 32px;
-    height: 32px;
-    padding: var(--spacing-xs);
-    font-size: var(--font-lg);
-  }
 }
