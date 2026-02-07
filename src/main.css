@@ -638,25 +638,20 @@ body {
 
 /* Home Page Styles */
 .home-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: min(var(--spacing-xl), 4vw);
-  box-sizing: border-box;
   width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+  box-sizing: border-box;
 }
 
 .home-header {
   text-align: center;
-  margin-bottom: min(var(--spacing-2xl), 8vw);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 min(var(--spacing-md), 4vw);
-  box-sizing: border-box;
+  margin-bottom: var(--spacing-2xl);
+  width: 100%;
 }
 
 .home-title {
-  font-size: clamp(2rem, 5vw, var(--font-5xl));
+  font-size: var(--font-5xl);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: var(--spacing-md);
@@ -664,57 +659,56 @@ body {
 }
 
 .home-subtitle {
-  font-size: clamp(var(--font-lg), 3vw, var(--font-xl));
+  font-size: var(--font-xl);
   color: var(--text-primary);
   font-weight: 500;
   margin-bottom: var(--spacing-lg);
 }
 
 .home-description {
-  margin-top: min(var(--spacing-xl), 6vw);
+  margin-top: var(--spacing-xl);
   text-align: left;
 }
 
 .description-text {
-  font-size: clamp(var(--font-base), 2.5vw, var(--font-lg));
+  font-size: var(--font-lg);
   color: var(--text-secondary);
   line-height: 1.7;
-  max-width: 700px;
+  width: 100%;
   margin: 0 auto;
 }
 
 .home-features {
-  margin: min(var(--spacing-2xl), 8vw) 0;
-  padding: min(var(--spacing-2xl), 8vw) 0;
+  margin: var(--spacing-2xl) 0;
+  padding: var(--spacing-2xl) 0;
+  width: 100%;
 }
 
 .features-title {
-  font-size: clamp(var(--font-2xl), 4vw, var(--font-3xl));
+  font-size: var(--font-3xl);
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
-  margin-bottom: min(var(--spacing-xl), 6vw);
+  margin-bottom: var(--spacing-xl);
 }
 
 .features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: min(var(--spacing-lg), 4vw);
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 min(var(--spacing-md), 4vw);
-  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  width: 100%;
+  justify-content: center;
 }
 
 .feature-card {
   background: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: min(var(--spacing-xl), 5vw);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease-in-out;
   text-align: center;
-  box-sizing: border-box;
+  flex: 1 1 280px;
 }
 
 .feature-card:hover {
@@ -723,7 +717,7 @@ body {
 }
 
 .feature-heading {
-  font-size: clamp(var(--font-lg), 2.5vw, var(--font-xl));
+  font-size: var(--font-xl);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: var(--spacing-md);
@@ -737,25 +731,23 @@ body {
 }
 
 #crosswords {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: min(var(--spacing-xl), 4vw);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xl);
   margin-top: var(--spacing-lg);
-  padding: 0 min(var(--spacing-md), 4vw);
-  box-sizing: border-box;
+  width: 100%;
 }
 
 .series {
   background: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: min(var(--spacing-xl), 5vw);
+  padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
+  flex: 1 1 320px;
 }
 
 .series:hover {
@@ -773,7 +765,7 @@ body {
 }
 
 .header h2 {
-  font-size: clamp(var(--font-xl), 3vw, var(--font-2xl));
+  font-size: var(--font-2xl);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -813,18 +805,15 @@ body {
 
 .link a {
   display: block;
-  padding: min(var(--spacing-md), 3vw) min(var(--spacing-lg), 4vw);
+  padding: var(--spacing-md) var(--spacing-lg);
   text-decoration: none;
   color: var(--text-primary);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   transition: all 0.15s ease-in-out;
   font-weight: 500;
-  font-size: clamp(var(--font-sm), 2vw, var(--font-base));
+  font-size: var(--font-base);
   background-color: var(--background-color);
-  box-sizing: border-box;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .link a:hover {
