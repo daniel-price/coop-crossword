@@ -492,11 +492,11 @@ All level cards include:
   outline: 3px solid var(--primary-color);
   outline-offset: -1px;
   z-index: 1;
-  background-color: var(--cell-selected-bg) !important;
+  background-color: var(--cell-selected-bg);
 }
 
 .cell-highlighted {
-  background-color: var(--cell-highlighted-bg) !important;
+  background-color: var(--cell-highlighted-bg);
 }
 ```
 
@@ -911,6 +911,10 @@ transition: all 0.2s ease-in-out; /* Standard transitions */
 3. Include hover/focus/active states
 4. Document in this guide
 5. Ensure responsive behavior
+
+### CSS Conventions
+
+- **Do not use `!important`.** Use specificity and source order to control the cascade. If a style is being overridden, increase selector specificity (e.g. `.cell.cell--selected`) or reorder rules instead of using `!important`.
 
 ### Version History
 

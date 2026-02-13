@@ -1,11 +1,38 @@
 :root {
-  --primary-color: #000000;
+  /* Primary & secondary */
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
   --secondary-color: #64748b;
   --background-color: #f8fafc;
   --surface-color: #ffffff;
   --text-primary: #0f172a;
   --text-secondary: #64748b;
   --border-color: #e2e8f0;
+
+  /* Accent colors */
+  --accent-teal: #14b8a6;
+  --accent-yellow: #fbbf24;
+  --accent-purple: #a78bfa;
+  --accent-pink: #f472b6;
+  --accent-light-blue: #60a5fa;
+
+  /* Level card backgrounds */
+  --level-easy-bg: #ffffff;
+  --level-normal-bg: #fef3c7;
+  --level-difficult-bg: #f3e8ff;
+
+  /* State colors */
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --warning-color: #f59e0b;
+  --info-color: #3b82f6;
+
+  /* Crossword-specific */
+  --cell-selected-bg: #eff6ff;
+  --cell-highlighted-bg: #fef3c7;
+  --clue-selected-bg: #fef3c7;
+  --clue-selected-border: #f59e0b;
+
   --shadow-sm: 0 0.0625rem 0.125rem 0 rgb(0 0 0 / 0.05);
   --shadow-md:
     0 0.25rem 0.375rem -0.0625rem rgb(0 0 0 / 0.1),
@@ -169,13 +196,14 @@ body {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   border: 0.0625rem solid var(--border-color);
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-size: var(--font-xl);
 }
 
 .header__favicon:hover {
-  background: var(--text-primary);
-  color: white;
+  color: var(--text-primary);
+  background: var(--background-color);
+  border-color: var(--primary-color);
   transform: scale(1.05);
 }
 
@@ -322,7 +350,7 @@ body {
   color: var(--text-primary);
   font-weight: 700;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.025em;
   line-height: 1.2;
 }
 
@@ -464,12 +492,12 @@ body {
 
 .share-section__input:focus {
   outline: none;
-  border-color: var(--text-primary);
-  box-shadow: 0 0 0 0.1875rem rgba(15, 23, 42, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.1875rem rgba(37, 99, 235, 0.1);
 }
 
 .share-section__button {
-  background-color: var(--text-primary);
+  background-color: var(--primary-color);
   color: white;
   border: none;
   padding: var(--spacing-md) var(--spacing-lg);
@@ -484,7 +512,7 @@ body {
 }
 
 .share-section__button:hover {
-  background-color: var(--primary-color);
+  background-color: var(--primary-hover);
   transform: translateY(-0.0625rem);
   box-shadow: var(--shadow-md);
 }
@@ -619,14 +647,14 @@ body {
 }
 
 .cell--selected {
-  outline: 0.1875rem solid var(--secondary-color);
+  outline: 0.1875rem solid var(--primary-color);
   outline-offset: -0.0625rem;
   z-index: 1;
-  background-color: var(--surface-color);
+  background-color: var(--cell-selected-bg);
 }
 
 .cell--highlighted {
-  background-color: #fef3c7;
+  background-color: var(--cell-highlighted-bg);
 }
 
 /* Clues Block */
@@ -701,8 +729,8 @@ body {
 }
 
 .clue--selected {
-  background-color: #fef3c7;
-  outline: 0.0625rem solid #f59e0b;
+  background-color: var(--clue-selected-bg);
+  outline: 0.0625rem solid var(--clue-selected-border);
 }
 
 .clue--filled {
@@ -758,24 +786,29 @@ body {
 }
 
 .button--primary {
-  background-color: var(--text-primary);
+  background-color: var(--primary-color);
   color: white;
-  border-color: var(--text-primary);
+  border-color: var(--primary-color);
 }
 
 .button--primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
   box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .button--secondary {
   background-color: var(--surface-color);
   color: var(--text-primary);
-  border-color: var(--text-primary);
+  border: 0.0625rem solid var(--border-color);
 }
 
 .button--secondary:hover {
-  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
   background-color: var(--background-color);
+  box-shadow: var(--shadow-md);
 }
 
 /* Info Block */
@@ -1058,7 +1091,7 @@ body {
   align-items: center;
   min-height: 12.5rem;
   font-size: var(--font-lg);
-  color: #dc2626;
+  color: var(--error-color);
   background-color: #fef2f2;
   border: 0.0625rem solid #fecaca;
   border-radius: var(--radius-sm);
@@ -1075,16 +1108,16 @@ body {
 }
 
 .toast--info {
-  background: #3b82f6;
+  background: var(--info-color);
   color: white;
 }
 
 .toast--error {
-  background: #dc2626;
+  background: var(--error-color);
   color: white;
 }
 
 .toast--success {
-  background: #10b981;
+  background: var(--success-color);
   color: white;
 }
