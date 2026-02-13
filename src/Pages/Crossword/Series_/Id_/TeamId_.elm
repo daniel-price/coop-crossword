@@ -240,9 +240,24 @@ updateCrossword msg loadedModel =
                 |> Effect.set Effect.none
 
         CursorPositionUpdated username coordinate ->
+            let
+                isNewJoin : Bool
+                isNewJoin =
+                    username
+                        /= loadedModel.username
+                        && not (Dict.member username loadedModel.otherUsersCursorPositions)
+
+                joinEffect : Effect Msg
+                joinEffect =
+                    if isNewJoin then
+                        Effect.showToast (username ++ " joined") "info"
+
+                    else
+                        Effect.none
+            in
             loadedModel
                 |> setOtherUsersCursorPosition username coordinate
-                |> Effect.set Effect.none
+                |> Effect.set joinEffect
 
         KeyDown key ->
             case key of

@@ -15,6 +15,7 @@ port module Effect exposing
     , setupFocusInputOnClick
     , sendCursorPositionUpdate
     , shareLink
+    , showToast
     )
 
 {-| This file was generated automatically by running elm-land customize effect
@@ -42,6 +43,7 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs setupFocusInputOnClick
 @docs sendCursorPositionUpdate
 @docs shareLink
+@docs showToast
 
 -}
 
@@ -278,6 +280,18 @@ shareLink { url, title, text } =
                 [ ( "url", Json.Encode.string url )
                 , ( "title", Json.Encode.string title )
                 , ( "text", Json.Encode.string text )
+                ]
+        }
+
+
+showToast : String -> String -> Effect msg
+showToast text toastType =
+    SendMessageToJavaScript
+        { tag = "SHOW_TOAST"
+        , data =
+            Json.Encode.object
+                [ ( "text", Json.Encode.string text )
+                , ( "type", Json.Encode.string toastType )
                 ]
         }
 

@@ -40,6 +40,10 @@ export const onReady = ({ app, env }) => {
           saveScrollableClues(data);
           return;
 
+        case "SHOW_TOAST":
+          showToastFromElm(data);
+          return;
+
         default:
           console.warn(`Unhandled outgoing port: "${tag}"`);
           return;
@@ -69,6 +73,16 @@ function toastError(text, error = null) {
   }
   console.error("Showing error toast: ", errorMessage, error);
   toast(errorMessage, "error");
+}
+
+function showToastFromElm(data) {
+  try {
+    const text = data?.text ?? "Notification";
+    const type = data?.type ?? "info";
+    toast(text, type);
+  } catch (err) {
+    console.error("Could not show toast from Elm", data, err);
+  }
 }
 
 function toast(text, type) {
