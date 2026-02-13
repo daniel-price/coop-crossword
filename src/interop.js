@@ -8,6 +8,7 @@ export const flags = ({ env }) => {
     teamId: getTeamId(),
     username: getUsername(),
     fontSize: getFontSize(),
+    scrollableClues: getScrollableClues(),
   };
 };
 
@@ -33,6 +34,10 @@ export const onReady = ({ app, env }) => {
 
         case "SAVE_FONT_SIZE":
           saveFontSize(data);
+          return;
+
+        case "SAVE_SCROLLABLE_CLUES":
+          saveScrollableClues(data);
           return;
 
         default:
@@ -180,6 +185,18 @@ function getFontSize() {
 
 function saveFontSize(fontSize) {
   localStorage.setItem("fontSize", fontSize);
+}
+
+function getScrollableClues() {
+  const stored = localStorage.getItem("scrollableClues");
+  if (stored !== null) {
+    return stored;
+  }
+  return "true";
+}
+
+function saveScrollableClues(value) {
+  localStorage.setItem("scrollableClues", value);
 }
 
 let ws;

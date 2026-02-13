@@ -28,16 +28,18 @@ type alias Flags =
     , teamId : String
     , username : String
     , fontSize : String
+    , scrollableClues : String
     }
 
 
 decoder : Json.Decode.Decoder Flags
 decoder =
-    Json.Decode.map4 Flags
+    Json.Decode.map5 Flags
         (Json.Decode.field "apiUrl" Json.Decode.string)
         (Json.Decode.field "teamId" Json.Decode.string)
         (Json.Decode.field "username" Json.Decode.string)
         (Json.Decode.field "fontSize" Json.Decode.string)
+        (Json.Decode.field "scrollableClues" Json.Decode.string)
 
 
 
@@ -56,6 +58,7 @@ init flagsResult _ =
               , teamId = flags.teamId
               , username = flags.username
               , fontSize = flags.fontSize
+              , scrollableClues = flags.scrollableClues
               }
             , Effect.none
             )
@@ -65,6 +68,7 @@ init flagsResult _ =
               , teamId = "team-id"
               , username = "anonymous"
               , fontSize = "Normal"
+              , scrollableClues = "true"
               }
             , Effect.none
             )

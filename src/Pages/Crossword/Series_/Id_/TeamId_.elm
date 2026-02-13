@@ -29,7 +29,7 @@ import View exposing (View)
 page : Shared.Model -> Route { series : String, id : String, teamId : String } -> Page Model Msg
 page sharedModel route =
     Page.new
-        { init = init route.params.series route.params.id route.params.teamId sharedModel.username sharedModel.fontSize
+        { init = init route.params.series route.params.id route.params.teamId sharedModel.username sharedModel.fontSize sharedModel.scrollableClues
         , update = update
         , subscriptions = subscriptions
         , view = view sharedModel
@@ -53,6 +53,7 @@ type alias LoadedModel =
     , showInfoPanel : Bool
     , showSettingsPanel : Bool
     , fontSize : FontSize
+    , scrollableClues : Bool
     , teamId : String
     }
 
@@ -61,15 +62,19 @@ type alias Model =
     WebData LoadedModel
 
 
-init : String -> String -> String -> String -> String -> () -> ( Model, Effect Msg )
-init series seriesNo teamId username fontSizeString () =
+init : String -> String -> String -> String -> String -> String -> () -> ( Model, Effect Msg )
+init series seriesNo teamId username fontSizeString scrollableCluesString () =
     let
         fontSize : FontSize
         fontSize =
             stringToFontSize fontSizeString
+
+        scrollableClues : Bool
+        scrollableClues =
+            stringToScrollableClues scrollableCluesString
     in
     ( Loading
-    , Crossword.fetch { series = series, id = seriesNo, onResponse = \result -> CrosswordFetched seriesNo teamId username fontSize result }
+    , Crossword.fetch { series = series, id = seriesNo, onResponse = \result -> CrosswordFetched seriesNo teamId username fontSize scrollableClues result }
     )
 
 
@@ -117,19 +122,20 @@ type CrosswordUpdatedMsg
     | ToggleInfo
     | ToggleSettings
     | SetFontSize FontSize
+    | SetScrollableClues Bool
     | ShareLink
 
 
 type Msg
     = NoOp
-    | CrosswordFetched String String String FontSize (WebData Crossword)
+    | CrosswordFetched String String String FontSize Bool (WebData Crossword)
     | CrosswordUpdated CrosswordUpdatedMsg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case ( msg, model ) of
-        ( CrosswordFetched id teamId username fontSize response, Loading ) ->
+        ( CrosswordFetched id teamId username fontSize scrollableClues response, Loading ) ->
             let
                 loadedModel : WebData LoadedModel
                 loadedModel =
@@ -169,6 +175,7 @@ update msg model =
                                 , showInfoPanel = False
                                 , showSettingsPanel = False
                                 , fontSize = fontSize
+                                , scrollableClues = scrollableClues
                                 , teamId = teamId
                                 }
                             )
@@ -361,6 +368,11 @@ updateCrossword msg loadedModel =
                 |> setFontSize fontSize
                 |> Effect.set (Effect.saveFontSize (fontSizeToString fontSize))
 
+        SetScrollableClues value ->
+            loadedModel
+                |> setScrollableClues value
+                |> Effect.set (Effect.saveScrollableClues (scrollableCluesToString value))
+
         ShareLink ->
             let
                 linkUrl : String
@@ -392,6 +404,25 @@ setShowSettingsPanel showSettingsPanel model =
 setFontSize : FontSize -> LoadedModel -> LoadedModel
 setFontSize fontSize model =
     { model | fontSize = fontSize }
+
+
+setScrollableClues : Bool -> LoadedModel -> LoadedModel
+setScrollableClues scrollableClues model =
+    { model | scrollableClues = scrollableClues }
+
+
+stringToScrollableClues : String -> Bool
+stringToScrollableClues string =
+    string == "true"
+
+
+scrollableCluesToString : Bool -> String
+scrollableCluesToString value =
+    if value then
+        "true"
+
+    else
+        "false"
 
 
 stringToFontSize : String -> FontSize
@@ -691,7 +722,7 @@ viewCrossword loadedModel =
                 , div [ class "crossword-page__container" ]
                     ([]
                         |> Build.add (viewGridContainer highlightedCoordinates loadedModel maybeHighlightedClue)
-                        |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
+                        |> Build.add (viewClues loadedModel.scrollableClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
                     )
                 , viewInfoModal loadedModel
                 , viewSettingsModal loadedModel
@@ -1020,6 +1051,7 @@ viewSettingsModal loadedModel =
                             ]
                         , div [ class "modal__body" ]
                             [ viewFontSizeControls loadedModel
+                            , viewScrollableCluesControl loadedModel
                             ]
                         ]
                     )
@@ -1074,6 +1106,49 @@ viewFontSizeControls loadedModel =
                     )
     in
     div attributes children
+
+
+viewScrollableCluesControl : LoadedModel -> Html Msg
+viewScrollableCluesControl loadedModel =
+    let
+        scrollableButton : Bool -> String -> Html Msg
+        scrollableButton value label =
+            let
+                isActive : Bool
+                isActive =
+                    loadedModel.scrollableClues == value
+
+                buttonClass : String
+                buttonClass =
+                    "settings-section__button"
+                        ++ (if isActive then
+                                " settings-section__button--active"
+
+                            else
+                                ""
+                           )
+            in
+            button
+                [ class buttonClass
+                , onClick (CrosswordUpdated (SetScrollableClues value))
+                ]
+                [ text label ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add
+                    (div [ class "settings-section__label" ]
+                        [ text "Scrollable clues" ]
+                    )
+                |> Build.add
+                    (div [ class "settings-section__controls" ]
+                        [ scrollableButton True "On"
+                        , scrollableButton False "Off"
+                        ]
+                    )
+    in
+    div [ class "settings-section" ] children
 
 
 viewCurrentClue : Clue -> Html Msg
@@ -1281,8 +1356,8 @@ getUserColor username =
         |> Maybe.withDefault "#E74C3C"
 
 
-viewClues : Crossword -> FilledLetters -> Maybe Clue -> List Clue -> Html Msg
-viewClues crossword filledLetters maybeHighlightedClue clues =
+viewClues : Bool -> Crossword -> FilledLetters -> Maybe Clue -> List Clue -> Html Msg
+viewClues scrollableClues crossword filledLetters maybeHighlightedClue clues =
     let
         acrossClues : List Clue
         acrossClues =
@@ -1295,6 +1370,7 @@ viewClues crossword filledLetters maybeHighlightedClue clues =
         attributes : List (Html.Attribute Msg)
         attributes =
             [ class "clues" ]
+                |> Build.addIf (not scrollableClues) (class "clues--no-inner-scroll")
 
         children : List (Html Msg)
         children =

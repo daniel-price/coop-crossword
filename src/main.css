@@ -637,10 +637,39 @@ body {
   gap: var(--spacing-lg);
   font-size: var(--crossword-font-3xl);
   max-height: 80vh;
-  overflow-y: auto;
+  overflow-y: scroll; /* show scrollbar track so scrollability is obvious */
   flex: 1 1 49%; /* equal width when side-by-side */
   min-width: var(--min-grid-width);
   max-width: 100%;
+  border: 0.0625rem solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  scrollbar-gutter: stable; /* reserve space for scrollbar, reduces layout shift */
+}
+
+/* Styled scrollbar so the clues area clearly looks scrollable */
+.clues::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.clues::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: var(--radius-sm);
+}
+
+.clues::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+.clues::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
+
+.clues--no-inner-scroll {
+  max-height: none;
+  overflow: visible;
+  scrollbar-gutter: auto;
 }
 
 .clues__list {

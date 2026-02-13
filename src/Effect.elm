@@ -11,6 +11,7 @@ port module Effect exposing
     , subscribeToWebsocket
     , subscribeToCursorPositionUpdates
     , saveFontSize
+    , saveScrollableClues
     , setupFocusInputOnClick
     , sendCursorPositionUpdate
     , shareLink
@@ -37,6 +38,7 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs subscribeToWebsocket
 @docs subscribeToCursorPositionUpdates
 @docs saveFontSize
+@docs saveScrollableClues
 @docs setupFocusInputOnClick
 @docs sendCursorPositionUpdate
 @docs shareLink
@@ -285,6 +287,14 @@ saveFontSize fontSize =
     SendMessageToJavaScript
         { tag = "SAVE_FONT_SIZE"
         , data = Json.Encode.string fontSize
+        }
+
+
+saveScrollableClues : String -> Effect msg
+saveScrollableClues value =
+    SendMessageToJavaScript
+        { tag = "SAVE_SCROLLABLE_CLUES"
+        , data = Json.Encode.string value
         }
 
 

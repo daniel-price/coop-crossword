@@ -15,4 +15,5 @@ type alias Model =
     , teamId : String
     , username : String
     , fontSize : String
+    , scrollableClues : String
     }
