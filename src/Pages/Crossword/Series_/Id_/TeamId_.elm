@@ -1,4 +1,4 @@
-module Pages.Crossword.Series_.Id_.TeamId_ exposing (LoadedModel, Model, Msg, page)
+module Pages.Crossword.Series_.Id_.TeamId_ exposing (FontSize(..), LoadedModel, Model, Msg, page)
 
 import Browser.Events
 import Components.CountdownButton as CountdownButton
@@ -10,9 +10,9 @@ import Data.FilledLetters exposing (FilledLetters)
 import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
-import Html exposing (Attribute, Html, a, div, input, text)
-import Html.Attributes exposing (class, href, id, style, value)
-import Html.Events exposing (on, onClick, targetValue)
+import Html exposing (Attribute, Html, a, button, div, h2, i, input, span, text)
+import Html.Attributes exposing (class, href, style, value)
+import Html.Events exposing (custom, on, onClick, targetValue)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as JD
@@ -29,7 +29,7 @@ import View exposing (View)
 page : Shared.Model -> Route { series : String, id : String, teamId : String } -> Page Model Msg
 page sharedModel route =
     Page.new
-        { init = init route.params.series route.params.id route.params.teamId sharedModel.username
+        { init = init route.params.series route.params.id route.params.teamId sharedModel.username sharedModel.fontSize
         , update = update
         , subscriptions = subscriptions
         , view = view sharedModel
@@ -50,6 +50,10 @@ type alias LoadedModel =
     , countdownButtonRevealModel : CountdownButton.Model
     , countdownButtonClearModel : CountdownButton.Model
     , username : String
+    , showInfoPanel : Bool
+    , showSettingsPanel : Bool
+    , fontSize : FontSize
+    , teamId : String
     }
 
 
@@ -57,10 +61,15 @@ type alias Model =
     WebData LoadedModel
 
 
-init : String -> String -> String -> String -> () -> ( Model, Effect Msg )
-init series seriesNo teamId username () =
+init : String -> String -> String -> String -> String -> () -> ( Model, Effect Msg )
+init series seriesNo teamId username fontSizeString () =
+    let
+        fontSize : FontSize
+        fontSize =
+            stringToFontSize fontSizeString
+    in
     ( Loading
-    , Crossword.fetch { series = series, id = seriesNo, onResponse = \result -> CrosswordFetched seriesNo teamId username result }
+    , Crossword.fetch { series = series, id = seriesNo, onResponse = \result -> CrosswordFetched seriesNo teamId username fontSize result }
     )
 
 
@@ -81,6 +90,12 @@ type Key
     | Arrow ArrowDirection
 
 
+type FontSize
+    = Normal
+    | Large
+    | ExtraLarge
+
+
 type CrosswordUpdatedMsg
     = CellSelected Coordinate
     | CellLetterAdded Coordinate Char
@@ -98,18 +113,23 @@ type CrosswordUpdatedMsg
     | CountdownButtonCheckMsg (CountdownButton.Msg Msg)
     | CountdownButtonRevealMsg (CountdownButton.Msg Msg)
     | CountdownButtonClearMsg (CountdownButton.Msg Msg)
+      -- Info panel
+    | ToggleInfo
+    | ToggleSettings
+    | SetFontSize FontSize
+    | ShareLink
 
 
 type Msg
     = NoOp
-    | CrosswordFetched String String String (WebData Crossword)
+    | CrosswordFetched String String String FontSize (WebData Crossword)
     | CrosswordUpdated CrosswordUpdatedMsg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case ( msg, model ) of
-        ( CrosswordFetched id teamId username response, Loading ) ->
+        ( CrosswordFetched id teamId username fontSize response, Loading ) ->
             let
                 loadedModel : WebData LoadedModel
                 loadedModel =
@@ -146,6 +166,10 @@ update msg model =
                                 , countdownButtonRevealModel = CountdownButton.init
                                 , countdownButtonClearModel = CountdownButton.init
                                 , username = username
+                                , showInfoPanel = False
+                                , showSettingsPanel = False
+                                , fontSize = fontSize
+                                , teamId = teamId
                                 }
                             )
 
@@ -171,53 +195,11 @@ update msg model =
 
         ( CrosswordUpdated crosswordUpdatedMsg, Success loadedModel ) ->
             loadedModel
-                |> resetFields crosswordUpdatedMsg
                 |> updateCrossword crosswordUpdatedMsg
                 |> Tuple.mapFirst Success
 
         _ ->
             model |> Effect.set Effect.none
-
-
-resetFields : CrosswordUpdatedMsg -> LoadedModel -> LoadedModel
-resetFields msg loadedModel =
-    case msg of
-        FilledLettersUpdated _ ->
-            loadedModel
-
-        _ ->
-            { loadedModel
-                | countdownButtonCheckModel =
-                    case msg of
-                        Check ->
-                            loadedModel.countdownButtonCheckModel
-
-                        CountdownButtonCheckMsg _ ->
-                            loadedModel.countdownButtonCheckModel
-
-                        _ ->
-                            CountdownButton.init
-                , countdownButtonRevealModel =
-                    case msg of
-                        Reveal ->
-                            loadedModel.countdownButtonRevealModel
-
-                        CountdownButtonRevealMsg _ ->
-                            loadedModel.countdownButtonRevealModel
-
-                        _ ->
-                            CountdownButton.init
-                , countdownButtonClearModel =
-                    case msg of
-                        Clear ->
-                            loadedModel.countdownButtonClearModel
-
-                        CountdownButtonClearMsg _ ->
-                            loadedModel.countdownButtonClearModel
-
-                        _ ->
-                            CountdownButton.init
-            }
 
 
 updateCrossword : CrosswordUpdatedMsg -> LoadedModel -> ( LoadedModel, Effect Msg )
@@ -363,6 +345,92 @@ updateCrossword msg loadedModel =
                 , msg = buttonMsg
                 , toParentModel = \model -> { loadedModel | countdownButtonClearModel = model }
                 }
+
+        ToggleInfo ->
+            loadedModel
+                |> setShowInfoPanel (not loadedModel.showInfoPanel)
+                |> Effect.set Effect.none
+
+        ToggleSettings ->
+            loadedModel
+                |> setShowSettingsPanel (not loadedModel.showSettingsPanel)
+                |> Effect.set Effect.none
+
+        SetFontSize fontSize ->
+            loadedModel
+                |> setFontSize fontSize
+                |> Effect.set (Effect.saveFontSize (fontSizeToString fontSize))
+
+        ShareLink ->
+            let
+                linkUrl : String
+                linkUrl =
+                    "https://allcluedin.com/crossword/" ++ loadedModel.crossword.series ++ "/" ++ loadedModel.crossword.seriesNo ++ "/" ++ loadedModel.teamId
+
+                title : String
+                title =
+                    Util.String.capitalizeFirstLetter loadedModel.crossword.series ++ " " ++ loadedModel.crossword.seriesNo
+
+                text : String
+                text =
+                    "Solve this crossword with me: " ++ title
+            in
+            loadedModel
+                |> Effect.set (Effect.shareLink { url = linkUrl, title = title, text = text })
+
+
+setShowInfoPanel : Bool -> LoadedModel -> LoadedModel
+setShowInfoPanel showInfoPanel model =
+    { model | showInfoPanel = showInfoPanel }
+
+
+setShowSettingsPanel : Bool -> LoadedModel -> LoadedModel
+setShowSettingsPanel showSettingsPanel model =
+    { model | showSettingsPanel = showSettingsPanel }
+
+
+setFontSize : FontSize -> LoadedModel -> LoadedModel
+setFontSize fontSize model =
+    { model | fontSize = fontSize }
+
+
+stringToFontSize : String -> FontSize
+stringToFontSize string =
+    case string of
+        "Large" ->
+            Large
+
+        "ExtraLarge" ->
+            ExtraLarge
+
+        _ ->
+            Normal
+
+
+fontSizeToString : FontSize -> String
+fontSizeToString fontSize =
+    case fontSize of
+        Normal ->
+            "Normal"
+
+        Large ->
+            "Large"
+
+        ExtraLarge ->
+            "ExtraLarge"
+
+
+fontSizeToMultiplier : FontSize -> Float
+fontSizeToMultiplier fontSize =
+    case fontSize of
+        Normal ->
+            1.0
+
+        Large ->
+            1.25
+
+        ExtraLarge ->
+            1.5
 
 
 handleClear : LoadedModel -> List Coordinate -> ( LoadedModel, Effect Msg )
@@ -577,13 +645,13 @@ view _ model =
     , body =
         case model of
             NotAsked ->
-                [ text "Loading..." ]
+                [ div [ class "loading-text" ] [ text "Preparing your crossword..." ] ]
 
             Loading ->
-                [ text "Loading..." ]
+                [ div [ class "loading-text" ] [ text "Loading puzzle..." ] ]
 
             Failure _ ->
-                [ text "Failed to load crossword" ]
+                [ div [ class "error-state" ] [ text "Oops! Couldn't load this crossword. Please try again." ] ]
 
             Success loadedModel ->
                 [ viewCrossword loadedModel ]
@@ -606,15 +674,29 @@ viewCrossword loadedModel =
             loadedModel.crossword
                 |> Crossword.getCurrentClue selectedCoordinate selectedDirection
 
+        fontSizeStyle : String
+        fontSizeStyle =
+            String.fromFloat (fontSizeToMultiplier loadedModel.fontSize * 0.375) ++ "rem"
+
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "crossword" ]
+            [ class "crossword-page"
+            , style "font-size" fontSizeStyle
+            ]
 
         children : List (Html Msg)
         children =
-            []
-                |> Build.add (viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel)
-                |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
+            [ div [ class "crossword-page__content-wrapper" ]
+                [ viewHeader loadedModel.showInfoPanel loadedModel.showSettingsPanel
+                , div [ class "crossword-page__container" ]
+                    ([]
+                        |> Build.add (viewGridContainer highlightedCoordinates loadedModel maybeHighlightedClue)
+                        |> Build.add (viewClues loadedModel.crossword loadedModel.filledLetters maybeHighlightedClue crossword.clues)
+                    )
+                , viewInfoModal loadedModel
+                , viewSettingsModal loadedModel
+                ]
+            ]
     in
     div attributes children
 
@@ -624,55 +706,80 @@ viewInfo crossword =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "info" ]
+            [ class "info" ]
 
-        setByString : String
-        setByString =
-            if crossword.setter == "" then
-                ""
-
-            else
-                " set by " ++ crossword.setter
+        infoItems : List (Html Msg)
+        infoItems =
+            [ viewInfoItem "Series" (Util.String.capitalizeFirstLetter crossword.series)
+            , viewInfoItem "Number" crossword.seriesNo
+            , viewInfoItem "Date" crossword.date
+            ]
+                |> Build.addIf (crossword.setter /= "")
+                    (viewInfoItem "Setter" crossword.setter)
 
         children : List (Html Msg)
         children =
             []
-                |> Build.add (text (Util.String.capitalizeFirstLetter crossword.series ++ " " ++ crossword.seriesNo ++ " - " ++ crossword.date ++ " -" ++ setByString ++ " for "))
                 |> Build.add
-                    (a [ href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo) ] [ text "the Guardian" ])
+                    (div [ class "info-details" ] infoItems)
+                |> Build.add
+                    (div [ class "info-details__link-container" ]
+                        [ a
+                            [ class "info-details__link"
+                            , href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo)
+                            ]
+                            [ text "View on The Guardian"
+                            , i [ class "fas fa-external-link-alt", style "margin-left" "0.5em" ] []
+                            ]
+                        ]
+                    )
     in
     div attributes children
 
 
-viewGridContainer : List Coordinate -> Maybe Clue -> LoadedModel -> Html Msg
-viewGridContainer highlightedCoordinates maybeHighlightedClue loadedModel =
+viewInfoItem : String -> String -> Html Msg
+viewInfoItem label value =
+    div [ class "info-details__item" ]
+        [ span [ class "info-details__label" ] [ text label ]
+        , span [ class "info-details__value" ] [ text value ]
+        ]
+
+
+viewGridContainer : List Coordinate -> LoadedModel -> Maybe Clue -> Html Msg
+viewGridContainer highlightedCoordinates loadedModel maybeHighlightedClue =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "grid-container" ]
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add (viewCrosswordGrid highlightedCoordinates maybeHighlightedClue loadedModel)
-                |> Build.add (viewButtons loadedModel)
-                |> Build.add (viewInfo loadedModel.crossword)
-    in
-    div attributes children
-
-
-viewCrosswordGrid : List Coordinate -> Maybe Clue -> LoadedModel -> Html Msg
-viewCrosswordGrid highlightedCoordinates maybeHighlightedClue loadedModel =
-    let
-        attributes : List (Attribute msg)
-        attributes =
-            [ id "crossword-grid" ]
+            [ class "grid-container" ]
 
         children : List (Html Msg)
         children =
             []
                 |> Build.addMaybeMap viewCurrentClue maybeHighlightedClue
-                |> Build.add (Grid.view [ id "grid" ] [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ] (viewCell highlightedCoordinates loadedModel) loadedModel.crossword.grid)
+                |> Build.addMaybeMap viewCurrentClueDuplicate maybeHighlightedClue
+                |> Build.add (viewCrosswordGrid highlightedCoordinates loadedModel)
+                |> Build.add (viewButtons loadedModel)
+    in
+    div attributes children
+
+
+viewCrosswordGrid : List Coordinate -> LoadedModel -> Html Msg
+viewCrosswordGrid highlightedCoordinates loadedModel =
+    let
+        attributes : List (Attribute msg)
+        attributes =
+            [ class "grid-container__grid" ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add
+                    (Grid.view
+                        [ class "grid" ]
+                        [ viewInput loadedModel.selectedCoordinate (Grid.getNumberOfRows loadedModel.crossword.grid) ]
+                        (viewCell highlightedCoordinates loadedModel)
+                        loadedModel.crossword.grid
+                    )
     in
     div attributes children
 
@@ -698,16 +805,16 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonCheckModel
                         , initial =
                             { text = "Check"
-                            , color = "#2b945a"
+                            , color = "#000000"
                             , onClick = CrosswordUpdated Check
                             }
                         , clicked =
                             { text = "Check All"
-                            , color = "#006400"
+                            , color = "#646464"
                             , onClick = CrosswordUpdated CheckAll
                             }
                         , toParentMsg = CountdownButtonCheckMsg >> CrosswordUpdated
-                        , additionalAttributes = [ class "button" ]
+                        , additionalAttributes = [ class "button button--primary" ]
                         }
                     )
                 |> Build.addIf shouldShowCheckAndReveal
@@ -715,16 +822,16 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonRevealModel
                         , initial =
                             { text = "Reveal"
-                            , color = "#4078c0"
+                            , color = "#ffffff"
                             , onClick = CrosswordUpdated Reveal
                             }
                         , clicked =
                             { text = "Reveal All"
-                            , color = "#174175"
+                            , color = "#bfbfbf"
                             , onClick = CrosswordUpdated RevealAll
                             }
                         , toParentMsg = CountdownButtonRevealMsg >> CrosswordUpdated
-                        , additionalAttributes = [ class "button" ]
+                        , additionalAttributes = [ class "button button--secondary" ]
                         }
                     )
                 |> Build.add
@@ -732,17 +839,238 @@ viewButtons loadedModel =
                         { model = loadedModel.countdownButtonClearModel
                         , initial =
                             { text = "Clear"
-                            , color = "#db3535"
+                            , color = "#ffffff"
                             , onClick = CrosswordUpdated Clear
                             }
                         , clicked =
                             { text = "Clear All"
-                            , color = "#9c1f1f"
+                            , color = "#bfbfbf"
                             , onClick = CrosswordUpdated ClearAll
                             }
                         , toParentMsg = CountdownButtonClearMsg >> CrosswordUpdated
-                        , additionalAttributes = [ class "button" ]
+                        , additionalAttributes = [ class "button button--secondary" ]
                         }
+                    )
+    in
+    div attributes children
+
+
+viewHeader : Bool -> Bool -> Html Msg
+viewHeader showInfoPanel showSettingsPanel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header" ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add viewHeaderFavicon
+                |> Build.add (viewHeaderRight showInfoPanel showSettingsPanel)
+    in
+    div attributes children
+
+
+viewHeaderFavicon : Html Msg
+viewHeaderFavicon =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header__favicon", href "/" ]
+
+        children : List (Html Msg)
+        children =
+            [ i [ class "fas fa-home" ] [] ]
+    in
+    a attributes children
+
+
+viewHeaderRight : Bool -> Bool -> Html Msg
+viewHeaderRight showInfoPanel showSettingsPanel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header__right" ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add (viewInfoButton showInfoPanel)
+                |> Build.add viewShareButton
+                |> Build.add (viewSettingsButton showSettingsPanel)
+    in
+    div attributes children
+
+
+viewInfoButton : Bool -> Html Msg
+viewInfoButton showInfoPanel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header__button", onClick (CrosswordUpdated ToggleInfo) ]
+                |> Build.addIf showInfoPanel (class "header__button--active")
+
+        children : List (Html Msg)
+        children =
+            [ i [ class "fas fa-circle-info" ] [] ]
+    in
+    button attributes children
+
+
+viewShareButton : Html Msg
+viewShareButton =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header__button", onClick (CrosswordUpdated ShareLink) ]
+
+        children : List (Html Msg)
+        children =
+            [ i [ class "fas fa-share-nodes" ] [] ]
+    in
+    button attributes children
+
+
+viewSettingsButton : Bool -> Html Msg
+viewSettingsButton showSettingsPanel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "header__button", onClick (CrosswordUpdated ToggleSettings) ]
+                |> Build.addIf showSettingsPanel (class "header__button--active")
+
+        children : List (Html Msg)
+        children =
+            [ i [ class "fas fa-gear" ] [] ]
+    in
+    button attributes children
+
+
+viewInfoModal : LoadedModel -> Html Msg
+viewInfoModal loadedModel =
+    let
+        crossword : Crossword
+        crossword =
+            loadedModel.crossword
+
+        backdropAttributes : List (Html.Attribute Msg)
+        backdropAttributes =
+            [ class "modal-backdrop" ]
+                |> Build.addIf (not loadedModel.showInfoPanel) (class "modal-backdrop--hidden")
+                |> Build.add (onClick (CrosswordUpdated ToggleInfo))
+
+        modalAttributes : List (Html.Attribute Msg)
+        modalAttributes =
+            [ class "modal"
+            , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
+            ]
+                |> Build.addIf (not loadedModel.showInfoPanel) (class "modal--hidden")
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add
+                    (div [ class "modal__content" ]
+                        [ div [ class "modal__header" ]
+                            [ h2 [ class "modal__title" ] [ text "Crossword Information" ]
+                            , button
+                                [ class "modal__close"
+                                , onClick (CrosswordUpdated ToggleInfo)
+                                ]
+                                [ i [ class "fas fa-times" ] [] ]
+                            ]
+                        , div [ class "modal__body" ]
+                            [ viewInfo crossword
+                            ]
+                        ]
+                    )
+    in
+    div backdropAttributes
+        [ div modalAttributes children ]
+
+
+viewSettingsModal : LoadedModel -> Html Msg
+viewSettingsModal loadedModel =
+    let
+        backdropAttributes : List (Html.Attribute Msg)
+        backdropAttributes =
+            [ class "modal-backdrop" ]
+                |> Build.addIf (not loadedModel.showSettingsPanel) (class "modal-backdrop--hidden")
+                |> Build.add (onClick (CrosswordUpdated ToggleSettings))
+
+        modalAttributes : List (Html.Attribute Msg)
+        modalAttributes =
+            [ class "modal"
+            , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
+            ]
+                |> Build.addIf (not loadedModel.showSettingsPanel) (class "modal--hidden")
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add
+                    (div [ class "modal__content" ]
+                        [ div [ class "modal__header" ]
+                            [ h2 [ class "modal__title" ] [ text "Settings" ]
+                            , button
+                                [ class "modal__close"
+                                , onClick (CrosswordUpdated ToggleSettings)
+                                ]
+                                [ i [ class "fas fa-times" ] [] ]
+                            ]
+                        , div [ class "modal__body" ]
+                            [ viewFontSizeControls loadedModel
+                            ]
+                        ]
+                    )
+    in
+    div backdropAttributes
+        [ div modalAttributes children ]
+
+
+viewFontSizeControls : LoadedModel -> Html Msg
+viewFontSizeControls loadedModel =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "settings-section" ]
+
+        fontSizeButton : FontSize -> String -> Html Msg
+        fontSizeButton fontSize label =
+            let
+                isActive : Bool
+                isActive =
+                    loadedModel.fontSize == fontSize
+
+                buttonClass : String
+                buttonClass =
+                    "settings-section__button"
+                        ++ (if isActive then
+                                " settings-section__button--active"
+
+                            else
+                                ""
+                           )
+            in
+            button
+                [ class buttonClass
+                , onClick (CrosswordUpdated (SetFontSize fontSize))
+                ]
+                [ text label ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add
+                    (div [ class "settings-section__label" ]
+                        [ text "Font Size" ]
+                    )
+                |> Build.add
+                    (div [ class "settings-section__controls" ]
+                        [ fontSizeButton Normal "Normal"
+                        , fontSizeButton Large "Large"
+                        , fontSizeButton ExtraLarge "Extra Large"
+                        ]
                     )
     in
     div attributes children
@@ -753,13 +1081,27 @@ viewCurrentClue clue =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "current-clue" ]
+            [ class "current-clue" ]
 
         children : List (Html Msg)
         children =
             []
-                |> Build.add (text (Clue.getNumberString clue ++ " "))
-                |> Build.concat (viewClueText clue)
+                |> Build.add (viewClueText clue)
+    in
+    div attributes children
+
+
+viewCurrentClueDuplicate : Clue -> Html Msg
+viewCurrentClueDuplicate clue =
+    let
+        attributes : List (Html.Attribute Msg)
+        attributes =
+            [ class "current-clue-duplicate", class "current-clue" ]
+
+        children : List (Html Msg)
+        children =
+            []
+                |> Build.add (viewClueText clue)
     in
     div attributes children
 
@@ -795,7 +1137,7 @@ viewInput selectedCoordinate numberOfRows =
 
         calcExpression : String -> String
         calcExpression coordinate =
-            "calc(min(99vw, 800px) * " ++ coordinate ++ ".5 / " ++ numberOfRowsString
+            "calc(min(99vw, 50rem) * " ++ coordinate ++ ".5 / " ++ numberOfRowsString
     in
     input
         [ class "crossword-input"
@@ -849,16 +1191,16 @@ viewCell highlightedCoordinates loadedModel coordinate cell =
             [ class "cell"
             , class
                 (if isWhite then
-                    "white"
+                    "cell--white"
 
                  else
-                    "black"
+                    "cell--black"
                 )
             ]
-                |> Build.addIf (coordinate == loadedModel.selectedCoordinate) (class "cell-selected")
+                |> Build.addIf (coordinate == loadedModel.selectedCoordinate) (class "cell--selected")
                 |> Build.addIf (not (List.isEmpty usersAtCoordinate)) (style "position" "relative")
                 |> Build.addIf isWhite (onClick (CrosswordUpdated (CellSelected coordinate)))
-                |> Build.addIf isHighlighted (class "cell-highlighted")
+                |> Build.addIf isHighlighted (class "cell--highlighted")
 
         children : List (Html Msg)
         children =
@@ -875,7 +1217,7 @@ viewCellNumber cellNumber =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ class "cell-number" ]
+            [ class "cell__number" ]
 
         children : List (Html Msg)
         children =
@@ -952,7 +1294,7 @@ viewClues crossword filledLetters maybeHighlightedClue clues =
 
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ id "clues" ]
+            [ class "clues" ]
 
         children : List (Html Msg)
         children =
@@ -968,7 +1310,7 @@ viewCluesList direction crossword filledLetters maybeHighlightedClue clues =
     let
         attributes : List (Html.Attribute Msg)
         attributes =
-            [ class "clues-list" ]
+            [ class "clues__list" ]
 
         children : List (Html Msg)
         children =
@@ -982,7 +1324,7 @@ viewCluesList direction crossword filledLetters maybeHighlightedClue clues =
 viewClueTitle : Direction -> Html Msg
 viewClueTitle direction =
     div
-        [ class "clue-title" ]
+        [ class "clues__title" ]
         [ text (Direction.toString direction) ]
 
 
@@ -1015,36 +1357,38 @@ viewClue crossword filledLetters maybeHighlightedClue clue =
         attributes : List (Html.Attribute Msg)
         attributes =
             [ class "clue" ]
-                |> Build.addIf (maybeHighlightedClue == Just clue) (id "clue-selected")
-                |> Build.addIf isClueFilled (class "clue-filled")
+                |> Build.addIf (maybeHighlightedClue == Just clue) (class "clue--selected")
+                |> Build.addIf isClueFilled (class "clue--filled")
                 |> Build.add (onClick (CrosswordUpdated (ClueSelected clue)))
 
         children : List (Html Msg)
         children =
             []
                 |> Build.add (viewClueNumber (Clue.getNumberString clue))
-                |> Build.concat (viewClueText clue)
+                |> Build.add (viewClueText clue)
     in
     div attributes children
 
 
-viewClueText : Clue -> List (Html Msg)
+viewClueText : Clue -> Html Msg
 viewClueText clue =
     let
         clueText : String
         clueText =
             Clue.getText clue
     in
-    case Html.Parser.run clueText of
-        Ok nodes ->
-            Html.Parser.Util.toVirtualDom nodes
+    div [ class "clue__text" ]
+        (case Html.Parser.run clueText of
+            Ok nodes ->
+                Html.Parser.Util.toVirtualDom nodes
 
-        Err _ ->
-            [ text clueText ]
+            Err _ ->
+                [ text clueText ]
+        )
 
 
 viewClueNumber : String -> Html Msg
 viewClueNumber clueNumber =
     div
-        [ class "clue-number" ]
+        [ class "clue__number" ]
         [ text clueNumber ]

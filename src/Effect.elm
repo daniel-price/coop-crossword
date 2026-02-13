@@ -10,8 +10,10 @@ port module Effect exposing
     , sendWebsocketMessage
     , subscribeToWebsocket
     , subscribeToCursorPositionUpdates
+    , saveFontSize
     , setupFocusInputOnClick
     , sendCursorPositionUpdate
+    , shareLink
     )
 
 {-| This file was generated automatically by running elm-land customize effect
@@ -34,8 +36,10 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs sendWebsocketMessage
 @docs subscribeToWebsocket
 @docs subscribeToCursorPositionUpdates
+@docs saveFontSize
 @docs setupFocusInputOnClick
 @docs sendCursorPositionUpdate
+@docs shareLink
 
 -}
 
@@ -263,6 +267,27 @@ sendWebsocketMessage username messages =
         }
 
 
+shareLink : { url : String, title : String, text : String } -> Effect msg
+shareLink { url, title, text } =
+    SendMessageToJavaScript
+        { tag = "SHARE_LINK"
+        , data =
+            Json.Encode.object
+                [ ( "url", Json.Encode.string url )
+                , ( "title", Json.Encode.string title )
+                , ( "text", Json.Encode.string text )
+                ]
+        }
+
+
+saveFontSize : String -> Effect msg
+saveFontSize fontSize =
+    SendMessageToJavaScript
+        { tag = "SAVE_FONT_SIZE"
+        , data = Json.Encode.string fontSize
+        }
+
+
 sendCursorPositionUpdate : String -> Coordinate -> Effect msg
 sendCursorPositionUpdate username ( x, y ) =
     SendMessageToJavaScript
@@ -329,6 +354,9 @@ subscribeToCursorPositionUpdates : (String -> Coordinate -> msg) -> msg -> Sub m
 subscribeToCursorPositionUpdates successMsg failureMsg =
     messageReceiver
         (\string ->
+            -- Try to decode as cursor position update
+            -- Cursor position messages are objects with x, y, and user/modified_by
+            -- Filled letters messages are arrays, so they won't match this decoder
             case
                 Json.Decode.decodeString
                     (Json.Decode.map3
@@ -337,7 +365,11 @@ subscribeToCursorPositionUpdates successMsg failureMsg =
                         )
                         (Json.Decode.field "x" Json.Decode.int)
                         (Json.Decode.field "y" Json.Decode.int)
-                        (Json.Decode.field "user" Json.Decode.string)
+                        (Json.Decode.oneOf
+                            [ Json.Decode.field "user" Json.Decode.string
+                            , Json.Decode.field "modified_by" Json.Decode.string
+                            ]
+                        )
                     )
                     string
             of
@@ -345,6 +377,8 @@ subscribeToCursorPositionUpdates successMsg failureMsg =
                     msg
 
                 Err _ ->
+                    -- Not a cursor position message (might be filled letters array or other format)
+                    -- Return failureMsg which will be ignored, allowing other subscriptions to handle it
                     failureMsg
         )
 
