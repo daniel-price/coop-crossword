@@ -27,15 +27,17 @@ type alias Flags =
     { apiUrl : String
     , teamId : String
     , username : String
+    , fontSize : String
     }
 
 
 decoder : Json.Decode.Decoder Flags
 decoder =
-    Json.Decode.map3 Flags
+    Json.Decode.map4 Flags
         (Json.Decode.field "apiUrl" Json.Decode.string)
         (Json.Decode.field "teamId" Json.Decode.string)
         (Json.Decode.field "username" Json.Decode.string)
+        (Json.Decode.field "fontSize" Json.Decode.string)
 
 
 
@@ -53,6 +55,7 @@ init flagsResult _ =
             ( { apiUrl = flags.apiUrl
               , teamId = flags.teamId
               , username = flags.username
+              , fontSize = flags.fontSize
               }
             , Effect.none
             )
@@ -61,6 +64,7 @@ init flagsResult _ =
             ( { apiUrl = "https://cooperative-crosswords-be.fly.dev/"
               , teamId = "team-id"
               , username = "anonymous"
+              , fontSize = "Normal"
               }
             , Effect.none
             )

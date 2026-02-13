@@ -7,6 +7,7 @@ export const flags = ({ env }) => {
     apiUrl: env.API_URL || "https://cooperative-crosswords-be.fly.dev/",
     teamId: getTeamId(),
     username: getUsername(),
+    fontSize: getFontSize(),
   };
 };
 
@@ -17,11 +18,21 @@ export const onReady = ({ app, env }) => {
         case "CREATE_WEBSOCKET":
           createWebSocket(app, env, data);
           return;
+
         case "SEND_WEBSOCKET_MESSAGE":
           sendWebSocketMessage(data);
           return;
+
         case "SETUP_FOCUS_INPUT_ON_CLICK":
           setupFocusInputOnClick();
+          return;
+
+        case "SHARE_LINK":
+          shareLink(data);
+          return;
+
+        case "SAVE_FONT_SIZE":
+          saveFontSize(data);
           return;
 
         default:
@@ -31,6 +42,104 @@ export const onReady = ({ app, env }) => {
     });
   }
 };
+
+function toastInfo(text) {
+  console.log("Showing info toast: ", text);
+  toast(text, "info");
+}
+
+function toastSuccess(text) {
+  console.log("Showing success toast: ", text);
+  toast(text, "success");
+}
+
+function toastError(text, error = null) {
+  let errorMessage = text;
+  if (error instanceof Error) {
+    errorMessage = `${text}: ${error.message}`;
+  } else if (error) {
+    errorMessage = `${text}: ${error}`;
+  } else if (typeof error === "string") {
+    errorMessage = `${text}: ${error}`;
+  }
+  console.error("Showing error toast: ", errorMessage, error);
+  toast(errorMessage, "error");
+}
+
+function toast(text, type) {
+  try {
+    document.querySelectorAll(".toast").forEach((el) => {
+      el?.remove();
+    });
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.classList.add(`toast--${type}`);
+    el.textContent = text;
+
+    document.body.appendChild(el);
+
+    setTimeout(() => {
+      el?.remove();
+    }, 2000);
+  } catch (err) {
+    console.error("Could not show toast: ", text, type);
+  }
+}
+
+function copyToClipboard(text) {
+  if (!navigator.clipboard) {
+    toastError(
+      "Could not copy link to clipboard",
+      "Clipboard API not available",
+    );
+    return;
+  }
+
+  toastInfo("Copying link to clipboard...");
+
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      toastSuccess("Link copied to clipboard");
+    })
+    .catch((err) => {
+      toastError("Could not copy link to clipboard", err);
+    });
+}
+
+function shareLink(data) {
+  const { url, title, text } = data;
+  const shareData = {
+    title: title || "Crossword Link",
+    text: text || "Check out this crossword!",
+    url: url,
+  };
+
+  if (navigator.share) {
+    toastInfo("Sharing link...");
+    navigator
+      .share(shareData)
+      .then(() => {
+        toastSuccess("Link shared successfully");
+      })
+      .catch((err) => {
+        if (err.name === "InvalidStateError") {
+          // clicked twice very quickly, ignore
+          return;
+        }
+
+        if (err.name === "AbortError") {
+          toastInfo("Share canceled");
+          return;
+        }
+
+        toastError("Could not share link", err);
+      });
+    return;
+  }
+
+  copyToClipboard(url);
+}
 
 function getTeamId() {
   const storedTeamId = localStorage.getItem("teamId");
@@ -61,10 +170,22 @@ function getUsername() {
   return username;
 }
 
+function getFontSize() {
+  const storedFontSize = localStorage.getItem("fontSize");
+  if (storedFontSize) {
+    return storedFontSize;
+  }
+  return "Normal";
+}
+
+function saveFontSize(fontSize) {
+  localStorage.setItem("fontSize", fontSize);
+}
+
 let ws;
 
 function createWebSocket(app, env, data) {
-  const { WEBSOCKET_URL } = env;
+  const { WEBSOCKET_URL = "ws://cooperative-crosswords-be.fly.dev/" } = env;
 
   if (!WEBSOCKET_URL) {
     console.error("Websocket url is required to create websocket");
@@ -87,7 +208,6 @@ function createWebSocket(app, env, data) {
     ws = new WebSocket(url);
 
     ws.addEventListener("message", function (event) {
-      console.log("Received message from websocket", event.data);
       app.ports.messageReceiver.send(event.data);
     });
     ws.onopen = function () {

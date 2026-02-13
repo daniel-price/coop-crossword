@@ -14,4 +14,5 @@ type alias Model =
     { apiUrl : String
     , teamId : String
     , username : String
+    , fontSize : String
     }
