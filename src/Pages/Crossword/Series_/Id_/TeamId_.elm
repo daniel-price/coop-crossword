@@ -798,7 +798,7 @@ viewInput selectedCoordinate numberOfRows =
             "calc(min(99vw, 800px) * " ++ coordinate ++ ".5 / " ++ numberOfRowsString
     in
     input
-        [ id "input"
+        [ class "crossword-input"
         , style "top" (calcExpression yString)
         , style "left" (calcExpression xString)
         , onInput

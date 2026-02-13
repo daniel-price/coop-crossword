@@ -1,4 +1,4 @@
-import { iosSafariPositionSticky } from "./ios-safari-position-sticky";
+import { setupStickyCurrentClue } from "./setup-sticky-current-clue";
 import { generateUsername } from "unique-username-generator";
 
 export const flags = ({ env }) => {
@@ -110,15 +110,6 @@ function sendWebSocketMessage(data) {
   ws.send(JSON.stringify(data));
 }
 
-function sendCursorPositionUpdate(data) {
-  if (!ws) {
-    console.error("Websocket is not initialized");
-    return;
-  }
-
-  ws.send(JSON.stringify(data));
-}
-
 /**
  * This function is called once, as soon as the crossword is loaded,
  * and enables us to have different behaviour for touch and non-touch devices.
@@ -139,13 +130,13 @@ function sendCursorPositionUpdate(data) {
  */
 async function setupFocusInputOnClick() {
   let i = 0;
-  while (!document.querySelector("#input")) {
+  while (!document.querySelector(".crossword-input")) {
     i++;
     await new Promise((resolve) => setTimeout(resolve, 0));
     console.log("waiting for input to be available" + i);
   }
   const focusInput = () => {
-    document.querySelector("#input").focus();
+    document.querySelector(".crossword-input")?.focus();
   };
 
   const setOnClickToFocusInput = (selector) => {
@@ -155,22 +146,67 @@ async function setupFocusInputOnClick() {
     });
   };
 
+  setupStickyCurrentClue();
+  setupModalScrollDisable();
+
   const isTouchDevice = "ontouchstart" in document.documentElement;
   if (isTouchDevice) {
-    /**
-      *
-#current-clue-wrap {
-  position: sticky;
-  top: 0px;
-  width: 100%;
-  z-index: 2;
-}*/
     setOnClickToFocusInput(".cell, .clue");
-    iosSafariPositionSticky();
     return;
   }
 
-  iosSafariPositionSticky();
   setOnClickToFocusInput("body");
   focusInput();
+}
+
+/**
+ * Disables body scroll when modals are open.
+ * Uses MutationObserver to watch for changes to modal-backdrop visibility.
+ */
+function setupModalScrollDisable() {
+  const checkModalState = () => {
+    const modals = document.querySelectorAll(".modal-backdrop");
+    const hasVisibleModal = Array.from(modals).some(
+      (modal) => !modal.classList.contains("modal-backdrop--hidden"),
+    );
+
+    if (hasVisibleModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  };
+
+  // Initial check (with a small delay to ensure modals might be rendered)
+  setTimeout(checkModalState, 100);
+
+  // Watch for changes to modal-backdrop elements
+  const observer = new MutationObserver((mutations) => {
+    // Only check if the mutation is related to modal elements
+    const shouldCheck = mutations.some((mutation) => {
+      const target = mutation.target;
+      return (
+        target.classList?.contains("modal-backdrop") ||
+        target.classList?.contains("modal-backdrop--hidden") ||
+        Array.from(mutation.addedNodes).some(
+          (node) =>
+            node.nodeType === 1 &&
+            (node.classList?.contains("modal-backdrop") ||
+              node.querySelector?.(".modal-backdrop")),
+        )
+      );
+    });
+
+    if (shouldCheck) {
+      checkModalState();
+    }
+  });
+
+  // Observe the document body for changes to modal elements
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"],
+  });
 }
