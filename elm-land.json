@@ -34,6 +34,11 @@
         {
           "rel": "stylesheet",
           "href": "/main.css"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/favicon.png"
         }
       ],
       "script": []
