@@ -1,5 +1,6 @@
 import { setupStickyCurrentClue } from "./setup-sticky-current-clue";
 import { generateUsername } from "unique-username-generator";
+import "./main.css";
 
 export const flags = ({ env }) => {
   return {
