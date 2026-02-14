@@ -12,6 +12,7 @@ port module Effect exposing
     , subscribeToCursorPositionUpdates
     , saveFontSize
     , saveScrollableClues
+    , saveUsername
     , setupFocusInputOnClick
     , sendCursorPositionUpdate
     , shareLink
@@ -40,6 +41,7 @@ I then fixed the elm-review errors (mostly removing unused functions) - if you n
 @docs subscribeToCursorPositionUpdates
 @docs saveFontSize
 @docs saveScrollableClues
+@docs saveUsername
 @docs setupFocusInputOnClick
 @docs sendCursorPositionUpdate
 @docs shareLink
@@ -309,6 +311,14 @@ saveScrollableClues value =
     SendMessageToJavaScript
         { tag = "SAVE_SCROLLABLE_CLUES"
         , data = Json.Encode.string value
+        }
+
+
+saveUsername : String -> Effect msg
+saveUsername username =
+    SendMessageToJavaScript
+        { tag = "SAVE_USERNAME"
+        , data = Json.Encode.string username
         }
 
 

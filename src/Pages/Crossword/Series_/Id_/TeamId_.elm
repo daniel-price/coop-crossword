@@ -11,16 +11,18 @@ import Data.Grid as Grid exposing (Coordinate, Grid)
 import Dict
 import Effect exposing (Effect)
 import Html exposing (Attribute, Html, a, button, div, h2, i, input, span, text)
-import Html.Attributes exposing (class, href, style, value)
-import Html.Events exposing (custom, on, onClick, targetValue)
+import Html.Attributes exposing (class, href, placeholder, style, value)
+import Html.Events exposing (custom, on, onBlur, onClick, onInput, targetValue)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as JD
 import List.Extra
 import Page exposing (Page)
+import Process
 import RemoteData exposing (RemoteData(..), WebData)
 import Route exposing (Route)
 import Shared
+import Task
 import Util.Build as Build
 import Util.String
 import View exposing (View)
@@ -55,6 +57,7 @@ type alias LoadedModel =
     , fontSize : FontSize
     , scrollableClues : Bool
     , teamId : String
+    , nameJustSaved : Bool
     }
 
 
@@ -93,6 +96,7 @@ type Key
     = Unknown
     | Backspace
     | Arrow ArrowDirection
+    | Escape
 
 
 type FontSize
@@ -121,6 +125,9 @@ type CrosswordUpdatedMsg
       -- Info panel
     | ToggleInfo
     | ToggleSettings
+    | SetUsername String
+    | SaveNameChanges
+    | ClearNameSavedFeedback
     | SetFontSize FontSize
     | SetScrollableClues Bool
     | ShareLink
@@ -177,6 +184,7 @@ update msg model =
                                 , fontSize = fontSize
                                 , scrollableClues = scrollableClues
                                 , teamId = teamId
+                                , nameJustSaved = False
                                 }
                             )
 
@@ -261,6 +269,20 @@ updateCrossword msg loadedModel =
 
         KeyDown key ->
             case key of
+                Escape ->
+                    ( if loadedModel.showSettingsPanel then
+                        loadedModel
+                            |> setShowSettingsPanel False
+                            |> (\m -> { m | nameJustSaved = False })
+
+                      else if loadedModel.showInfoPanel then
+                        loadedModel |> setShowInfoPanel False
+
+                      else
+                        loadedModel
+                    , Effect.none
+                    )
+
                 Backspace ->
                     case Dict.get loadedModel.selectedCoordinate loadedModel.filledLetters of
                         Just _ ->
@@ -374,9 +396,19 @@ updateCrossword msg loadedModel =
                 |> Effect.set Effect.none
 
         ToggleSettings ->
-            loadedModel
-                |> setShowSettingsPanel (not loadedModel.showSettingsPanel)
-                |> Effect.set Effect.none
+            let
+                m : LoadedModel
+                m =
+                    loadedModel
+                        |> setShowSettingsPanel (not loadedModel.showSettingsPanel)
+            in
+            ( if loadedModel.showSettingsPanel then
+                { m | nameJustSaved = False }
+
+              else
+                m
+            , Effect.none
+            )
 
         SetFontSize fontSize ->
             loadedModel
@@ -387,6 +419,27 @@ updateCrossword msg loadedModel =
             loadedModel
                 |> setScrollableClues value
                 |> Effect.set (Effect.saveScrollableClues (scrollableCluesToString value))
+
+        SetUsername username ->
+            ( { loadedModel | username = username, nameJustSaved = False }
+            , Effect.none
+            )
+
+        SaveNameChanges ->
+            ( { loadedModel | nameJustSaved = True }
+            , Effect.batch
+                [ Effect.saveUsername loadedModel.username
+                , Effect.sendCmd
+                    (Process.sleep 2000
+                        |> Task.perform (\_ -> CrosswordUpdated ClearNameSavedFeedback)
+                    )
+                ]
+            )
+
+        ClearNameSavedFeedback ->
+            ( { loadedModel | nameJustSaved = False }
+            , Effect.none
+            )
 
         ShareLink ->
             let
@@ -668,6 +721,9 @@ keyDownSubscription =
 
                 "ArrowDown" ->
                     Arrow ArrowDown
+
+                "Escape" ->
+                    Escape
 
                 _ ->
                     Unknown
@@ -995,10 +1051,6 @@ viewSettingsButton showSettingsPanel =
 viewInfoModal : LoadedModel -> Html Msg
 viewInfoModal loadedModel =
     let
-        crossword : Crossword
-        crossword =
-            loadedModel.crossword
-
         backdropAttributes : List (Html.Attribute Msg)
         backdropAttributes =
             [ class "modal-backdrop" ]
@@ -1026,7 +1078,7 @@ viewInfoModal loadedModel =
                                 [ i [ class "fas fa-times" ] [] ]
                             ]
                         , div [ class "modal__body" ]
-                            [ viewInfo crossword
+                            [ viewInfo loadedModel.crossword
                             ]
                         ]
                     )
@@ -1046,7 +1098,7 @@ viewSettingsModal loadedModel =
 
         modalAttributes : List (Html.Attribute Msg)
         modalAttributes =
-            [ class "modal"
+            [ class "modal modal--fit-content"
             , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
             ]
                 |> Build.addIf (not loadedModel.showSettingsPanel) (class "modal--hidden")
@@ -1064,10 +1116,8 @@ viewSettingsModal loadedModel =
                                 ]
                                 [ i [ class "fas fa-times" ] [] ]
                             ]
-                        , div [ class "modal__body" ]
-                            [ viewFontSizeControls loadedModel
-                            , viewScrollableCluesControl loadedModel
-                            ]
+                        , div [ class "modal__body settings-grid" ]
+                            (viewSettingsGrid loadedModel)
                         ]
                     )
     in
@@ -1075,13 +1125,61 @@ viewSettingsModal loadedModel =
         [ div modalAttributes children ]
 
 
-viewFontSizeControls : LoadedModel -> Html Msg
-viewFontSizeControls loadedModel =
-    let
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ class "settings-section" ]
+viewSettingsGrid : LoadedModel -> List (Html Msg)
+viewSettingsGrid loadedModel =
+    [ viewSettingsGroup "Solving with team"
+        (div [ class "settings-grid__control settings-grid__control--readonly" ]
+            [ span [ class "settings-section__value settings-grid__value-readonly" ] [ text loadedModel.teamId ]
+            , div [ class "settings-grid__readonly-hint" ]
+                [ i [ class "fas fa-lock settings-grid__readonly-icon" ] []
+                , text "To solve with a different team, change the team name in the end of the url"
+                ]
+            ]
+        )
+    , viewSettingsGroup "Your name"
+        (div [ class "settings-grid__control" ]
+            [ div [ class "settings-grid__name-row" ]
+                [ input
+                    [ class "settings-section__input settings-grid__input--editable"
+                    , value loadedModel.username
+                    , placeholder "Your display name"
+                    , onInput (\s -> CrosswordUpdated (SetUsername s))
+                    , onBlur (CrosswordUpdated SaveNameChanges)
+                    ]
+                    []
+                , if loadedModel.nameJustSaved then
+                    span [ class "settings-grid__saved" ] [ text "Saved" ]
 
+                  else
+                    text ""
+                ]
+            ]
+        )
+    , div [ class "settings-grid__section-heading" ] [ text "DISPLAY" ]
+    , viewSettingsGroup "Font size"
+        (div [ class "settings-grid__control" ]
+            [ viewFontSizeButtons loadedModel
+            ]
+        )
+    , viewSettingsGroup "Scrollable clues"
+        (div [ class "settings-grid__control" ]
+            [ viewScrollableCluesButtons loadedModel
+            ]
+        )
+    ]
+
+
+viewSettingsGroup : String -> Html Msg -> Html Msg
+viewSettingsGroup labelText control =
+    div [ class "settings-grid__group" ]
+        [ div [ class "settings-grid__label" ] [ text labelText ]
+        , control
+        ]
+
+
+viewFontSizeButtons : LoadedModel -> Html Msg
+viewFontSizeButtons loadedModel =
+    let
         fontSizeButton : FontSize -> String -> Html Msg
         fontSizeButton fontSize label =
             let
@@ -1104,27 +1202,16 @@ viewFontSizeControls loadedModel =
                 , onClick (CrosswordUpdated (SetFontSize fontSize))
                 ]
                 [ text label ]
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add
-                    (div [ class "settings-section__label" ]
-                        [ text "Font Size" ]
-                    )
-                |> Build.add
-                    (div [ class "settings-section__controls" ]
-                        [ fontSizeButton Normal "Normal"
-                        , fontSizeButton Large "Large"
-                        , fontSizeButton ExtraLarge "Extra Large"
-                        ]
-                    )
     in
-    div attributes children
+    div [ class "settings-grid__buttons" ]
+        [ fontSizeButton Normal "Normal"
+        , fontSizeButton Large "Large"
+        , fontSizeButton ExtraLarge "Extra Large"
+        ]
 
 
-viewScrollableCluesControl : LoadedModel -> Html Msg
-viewScrollableCluesControl loadedModel =
+viewScrollableCluesButtons : LoadedModel -> Html Msg
+viewScrollableCluesButtons loadedModel =
     let
         scrollableButton : Bool -> String -> Html Msg
         scrollableButton value label =
@@ -1148,22 +1235,11 @@ viewScrollableCluesControl loadedModel =
                 , onClick (CrosswordUpdated (SetScrollableClues value))
                 ]
                 [ text label ]
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add
-                    (div [ class "settings-section__label" ]
-                        [ text "Scrollable clues" ]
-                    )
-                |> Build.add
-                    (div [ class "settings-section__controls" ]
-                        [ scrollableButton True "On"
-                        , scrollableButton False "Off"
-                        ]
-                    )
     in
-    div [ class "settings-section" ] children
+    div [ class "settings-grid__buttons" ]
+        [ scrollableButton True "On"
+        , scrollableButton False "Off"
+        ]
 
 
 viewCurrentClue : Clue -> Html Msg

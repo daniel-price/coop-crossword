@@ -40,6 +40,10 @@ export const onReady = ({ app, env }) => {
           saveScrollableClues(data);
           return;
 
+        case "SAVE_USERNAME":
+          saveUsername(data);
+          return;
+
         case "SHOW_TOAST":
           showToastFromElm(data);
           return;
@@ -211,6 +215,21 @@ function getScrollableClues() {
 
 function saveScrollableClues(value) {
   localStorage.setItem("scrollableClues", value);
+}
+
+function getTeamName(teamId) {
+  const key = "teamName_" + (teamId || "").toUpperCase();
+  const stored = localStorage.getItem(key);
+  return stored != null ? stored : "";
+}
+
+function saveTeamName(teamId, name) {
+  const key = "teamName_" + (teamId || "").toUpperCase();
+  localStorage.setItem(key, name || "");
+}
+
+function saveUsername(username) {
+  localStorage.setItem("username", username || "");
 }
 
 let ws;

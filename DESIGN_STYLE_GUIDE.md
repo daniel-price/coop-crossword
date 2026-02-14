@@ -779,6 +779,21 @@ transition: all 0.2s ease-in-out; /* Standard transitions */
 }
 ```
 
+### Container-driven layout (no media queries)
+
+Settings and form layouts that should stack on narrow viewports **must not use viewport media queries**. Use container-relative CSS so the layout responds to the container width (e.g. modal or panel), not the viewport.
+
+**Pattern: Settings grid**
+
+- Use CSS Grid with **auto-fit** so columns collapse when the container is narrow:
+  - `grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));`
+  - When the container is wide enough, multiple columns (e.g. label | control) sit side by side; when narrow, a single column stacks rows.
+- Use **flexible widths** so controls reflow instead of overflowing:
+  - Inputs/readonly: `width: 100%; max-width: 9rem; min-width: 0;` so they fill the cell when stacked and cap at 9rem when there is space.
+  - Option button groups: `flex-wrap: wrap` on the container and `min-width: min(9rem, 100%)` on each button so buttons wrap and can shrink to full width in a single column.
+
+This keeps behavior consistent in narrow modals, side panels, or viewports without duplicating breakpoints in media queries.
+
 ### Touch Targets
 
 - **Minimum size**: 44px × 44px for touch interactions
