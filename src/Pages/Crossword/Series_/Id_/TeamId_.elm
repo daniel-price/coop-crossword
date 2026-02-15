@@ -21,8 +21,10 @@ import Page exposing (Page)
 import Process
 import RemoteData exposing (RemoteData(..), WebData)
 import Route exposing (Route)
+import Route.Path
 import Shared
 import Task
+import Url
 import Util.Build as Build
 import Util.String
 import View exposing (View)
@@ -57,6 +59,7 @@ type alias LoadedModel =
     , fontSize : FontSize
     , scrollableClues : Bool
     , teamId : String
+    , teamIdInput : String
     , nameJustSaved : Bool
     }
 
@@ -130,6 +133,8 @@ type CrosswordUpdatedMsg
     | ClearNameSavedFeedback
     | SetFontSize FontSize
     | SetScrollableClues Bool
+    | SetTeamIdInput String
+    | ApplyTeamId
     | ShareLink
 
 
@@ -144,6 +149,10 @@ update msg model =
     case ( msg, model ) of
         ( CrosswordFetched id teamId username fontSize scrollableClues response, Loading ) ->
             let
+                decodedTeamId : String
+                decodedTeamId =
+                    Url.percentDecode teamId |> Maybe.withDefault teamId
+
                 loadedModel : WebData LoadedModel
                 loadedModel =
                     response
@@ -183,7 +192,8 @@ update msg model =
                                 , showSettingsPanel = False
                                 , fontSize = fontSize
                                 , scrollableClues = scrollableClues
-                                , teamId = teamId
+                                , teamId = decodedTeamId
+                                , teamIdInput = decodedTeamId
                                 , nameJustSaved = False
                                 }
                             )
@@ -198,7 +208,7 @@ update msg model =
                                     loadedModelData.selectedCoordinate
                             in
                             Effect.batch
-                                [ Effect.createWebsocket id teamId
+                                [ Effect.createWebsocket id decodedTeamId
                                 , Effect.setupFocusInputOnClick
                                 , Effect.sendCursorPositionUpdate loadedModelData.username initialCoordinate
                                 ]
@@ -440,6 +450,36 @@ updateCrossword msg loadedModel =
             ( { loadedModel | nameJustSaved = False }
             , Effect.none
             )
+
+        SetTeamIdInput str ->
+            ( { loadedModel | teamIdInput = str }
+            , Effect.none
+            )
+
+        ApplyTeamId ->
+            let
+                newTeamId : String
+                newTeamId =
+                    String.trim loadedModel.teamIdInput
+            in
+            if newTeamId /= loadedModel.teamId && not (String.isEmpty newTeamId) then
+                ( loadedModel
+                , Effect.replaceRoute
+                    { path =
+                        Route.Path.Crossword_Series__Id__TeamId_
+                            { series = loadedModel.crossword.series
+                            , id = loadedModel.crossword.seriesNo
+                            , teamId = newTeamId
+                            }
+                    , query = Dict.empty
+                    , hash = Nothing
+                    }
+                )
+
+            else
+                ( { loadedModel | teamIdInput = loadedModel.teamId }
+                , Effect.none
+                )
 
         ShareLink ->
             let
@@ -803,50 +843,6 @@ viewCrossword loadedModel =
     div attributes children
 
 
-viewInfo : Crossword -> Html Msg
-viewInfo crossword =
-    let
-        attributes : List (Html.Attribute Msg)
-        attributes =
-            [ class "info" ]
-
-        infoItems : List (Html Msg)
-        infoItems =
-            [ viewInfoItem "Series" (Util.String.capitalizeFirstLetter crossword.series)
-            , viewInfoItem "Number" crossword.seriesNo
-            , viewInfoItem "Date" crossword.date
-            ]
-                |> Build.addIf (crossword.setter /= "")
-                    (viewInfoItem "Setter" crossword.setter)
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add
-                    (div [ class "info-details" ] infoItems)
-                |> Build.add
-                    (div [ class "info-details__link-container" ]
-                        [ a
-                            [ class "info-details__link"
-                            , href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo)
-                            ]
-                            [ text "View on The Guardian"
-                            , i [ class "fas fa-external-link-alt", style "margin-left" "0.5em" ] []
-                            ]
-                        ]
-                    )
-    in
-    div attributes children
-
-
-viewInfoItem : String -> String -> Html Msg
-viewInfoItem label value =
-    div [ class "info-details__item" ]
-        [ span [ class "info-details__label" ] [ text label ]
-        , span [ class "info-details__value" ] [ text value ]
-        ]
-
-
 viewGridContainer : List Coordinate -> LoadedModel -> Maybe Clue -> Html Msg
 viewGridContainer highlightedCoordinates loadedModel maybeHighlightedClue =
     let
@@ -1048,132 +1044,165 @@ viewSettingsButton showSettingsPanel =
     button attributes children
 
 
-viewInfoModal : LoadedModel -> Html Msg
-viewInfoModal loadedModel =
+viewModal :
+    { title : String
+    , onClose : Msg
+    , isHidden : Bool
+    , fontSizeStyle : String
+    , body : List (Html Msg)
+    }
+    -> Html Msg
+viewModal config =
     let
         backdropAttributes : List (Html.Attribute Msg)
         backdropAttributes =
             [ class "modal-backdrop" ]
-                |> Build.addIf (not loadedModel.showInfoPanel) (class "modal-backdrop--hidden")
-                |> Build.add (onClick (CrosswordUpdated ToggleInfo))
-
-        modalAttributes : List (Html.Attribute Msg)
-        modalAttributes =
-            [ class "modal"
-            , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
-            ]
-                |> Build.addIf (not loadedModel.showInfoPanel) (class "modal--hidden")
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add
-                    (div [ class "modal__content" ]
-                        [ div [ class "modal__header" ]
-                            [ h2 [ class "modal__title" ] [ text "Crossword Information" ]
-                            , button
-                                [ class "modal__close"
-                                , onClick (CrosswordUpdated ToggleInfo)
-                                ]
-                                [ i [ class "fas fa-times" ] [] ]
-                            ]
-                        , div [ class "modal__body" ]
-                            [ viewInfo loadedModel.crossword
-                            ]
-                        ]
-                    )
-    in
-    div backdropAttributes
-        [ div modalAttributes children ]
-
-
-viewSettingsModal : LoadedModel -> Html Msg
-viewSettingsModal loadedModel =
-    let
-        backdropAttributes : List (Html.Attribute Msg)
-        backdropAttributes =
-            [ class "modal-backdrop" ]
-                |> Build.addIf (not loadedModel.showSettingsPanel) (class "modal-backdrop--hidden")
-                |> Build.add (onClick (CrosswordUpdated ToggleSettings))
+                |> Build.addIf config.isHidden (class "modal-backdrop--hidden")
+                |> Build.add (onClick config.onClose)
 
         modalAttributes : List (Html.Attribute Msg)
         modalAttributes =
             [ class "modal modal--fit-content"
+            , style "font-size" config.fontSizeStyle
             , custom "click" (JD.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
             ]
-                |> Build.addIf (not loadedModel.showSettingsPanel) (class "modal--hidden")
-
-        children : List (Html Msg)
-        children =
-            []
-                |> Build.add
-                    (div [ class "modal__content" ]
-                        [ div [ class "modal__header" ]
-                            [ h2 [ class "modal__title" ] [ text "Settings" ]
-                            , button
-                                [ class "modal__close"
-                                , onClick (CrosswordUpdated ToggleSettings)
-                                ]
-                                [ i [ class "fas fa-times" ] [] ]
-                            ]
-                        , div [ class "modal__body settings-grid" ]
-                            (viewSettingsGrid loadedModel)
-                        ]
-                    )
+                |> Build.addIf config.isHidden (class "modal--hidden")
     in
     div backdropAttributes
-        [ div modalAttributes children ]
-
-
-viewSettingsGrid : LoadedModel -> List (Html Msg)
-viewSettingsGrid loadedModel =
-    [ viewSettingsGroup "Solving with team"
-        (div [ class "settings-grid__control settings-grid__control--readonly" ]
-            [ span [ class "settings-section__value settings-grid__value-readonly" ] [ text loadedModel.teamId ]
-            , div [ class "settings-grid__readonly-hint" ]
-                [ i [ class "fas fa-lock settings-grid__readonly-icon" ] []
-                , text "To solve with a different team, change the team name in the end of the url"
-                ]
-            ]
-        )
-    , viewSettingsGroup "Your name"
-        (div [ class "settings-grid__control" ]
-            [ div [ class "settings-grid__name-row" ]
-                [ input
-                    [ class "settings-section__input settings-grid__input--editable"
-                    , value loadedModel.username
-                    , placeholder "Your display name"
-                    , onInput (\s -> CrosswordUpdated (SetUsername s))
-                    , onBlur (CrosswordUpdated SaveNameChanges)
+        [ div modalAttributes
+            [ div [ class "modal__content" ]
+                [ div [ class "modal__header" ]
+                    [ h2 [ class "modal__title" ] [ text config.title ]
+                    , button
+                        [ class "modal__close"
+                        , onClick config.onClose
+                        ]
+                        [ i [ class "fas fa-times" ] [] ]
                     ]
-                    []
-                , if loadedModel.nameJustSaved then
-                    span [ class "settings-grid__saved" ] [ text "Saved" ]
-
-                  else
-                    text ""
+                , div [ class "modal__body" ] config.body
                 ]
             ]
-        )
-    , div [ class "settings-grid__section-heading" ] [ text "DISPLAY" ]
-    , viewSettingsGroup "Font size"
-        (div [ class "settings-grid__control" ]
-            [ viewFontSizeButtons loadedModel
+        ]
+
+
+viewModalSection : String -> Html Msg -> Html Msg
+viewModalSection label content =
+    div
+        [ class "modal-section"
+        , class (if label == "" then "modal-section--action" else "")
+        ]
+        [ div [ class "modal-section__label" ] [ text label ]
+        , div [ class "modal-section__content" ] [ content ]
+        ]
+
+
+viewModalSectionHeading : String -> Html Msg
+viewModalSectionHeading heading =
+    div [ class "modal-section-heading" ] [ text heading ]
+
+
+viewInfoModal : LoadedModel -> Html Msg
+viewInfoModal loadedModel =
+    viewModal
+        { title = "Crossword Information"
+        , onClose = CrosswordUpdated ToggleInfo
+        , isHidden = not loadedModel.showInfoPanel
+        , fontSizeStyle = String.fromFloat (fontSizeToMultiplier loadedModel.fontSize) ++ "rem"
+        , body = viewInfoSections loadedModel.crossword
+        }
+
+
+viewInfoSections : Crossword -> List (Html Msg)
+viewInfoSections crossword =
+    let
+        rows : List (Html Msg)
+        rows =
+            [ viewModalSection "Series" (span [ class "modal-section__value" ] [ text (Util.String.capitalizeFirstLetter crossword.series) ])
+            , viewModalSection "Number" (span [ class "modal-section__value" ] [ text crossword.seriesNo ])
+            , viewModalSection "Date" (span [ class "modal-section__value" ] [ text crossword.date ])
             ]
-        )
-    , viewSettingsGroup "Scrollable clues"
-        (div [ class "settings-grid__control" ]
-            [ viewScrollableCluesButtons loadedModel
-            ]
-        )
+                |> Build.addIf (crossword.setter /= "")
+                    (viewModalSection "Setter" (span [ class "modal-section__value" ] [ text crossword.setter ]))
+
+        guardianLink : Html Msg
+        guardianLink =
+            a
+                [ class "modal-section__link"
+                , href ("https://www.theguardian.com/crosswords/" ++ crossword.series ++ "/" ++ crossword.seriesNo)
+                ]
+                [ text "View on The Guardian"
+                , i [ class "fas fa-external-link-alt modal-section__link-icon" ] []
+                ]
+    in
+    rows ++ [ viewModalSection "" guardianLink ]
+
+
+viewSettingsModal : LoadedModel -> Html Msg
+viewSettingsModal loadedModel =
+    viewModal
+        { title = "Settings"
+        , onClose = CrosswordUpdated ToggleSettings
+        , isHidden = not loadedModel.showSettingsPanel
+        , fontSizeStyle = String.fromFloat (fontSizeToMultiplier loadedModel.fontSize) ++ "rem"
+        , body = viewSettingsSections loadedModel
+        }
+
+
+viewSettingsSections : LoadedModel -> List (Html Msg)
+viewSettingsSections loadedModel =
+    [ viewModalSection "Solving with team" (viewTeamIdControl loadedModel)
+    , viewModalSection "Your name" (viewUsernameControl loadedModel)
+    , viewModalSectionHeading "DISPLAY"
+    , viewModalSection "Font size" (viewFontSizeButtons loadedModel)
+    , viewModalSection "Scrollable clues" (viewScrollableCluesButtons loadedModel)
     ]
 
 
-viewSettingsGroup : String -> Html Msg -> Html Msg
-viewSettingsGroup labelText control =
-    div [ class "settings-grid__group" ]
-        [ div [ class "settings-grid__label" ] [ text labelText ]
-        , control
+viewTeamIdControl : LoadedModel -> Html Msg
+viewTeamIdControl loadedModel =
+    div [ class "modal-section__stack" ]
+        [ input
+            [ class "modal-section__input"
+            , value loadedModel.teamIdInput
+            , placeholder "Team name"
+            , onInput (\s -> CrosswordUpdated (SetTeamIdInput s))
+            , onBlur (CrosswordUpdated ApplyTeamId)
+            , custom "keydown"
+                (JD.field "key" JD.string
+                    |> JD.andThen
+                        (\key ->
+                            if key == "Enter" then
+                                JD.succeed { message = CrosswordUpdated ApplyTeamId, stopPropagation = True, preventDefault = True }
+
+                            else
+                                JD.fail "not Enter"
+                        )
+                )
+            ]
+            []
+        , div [ class "modal-section__hint modal-section__hint--warning" ]
+            [ i [ class "fas fa-exclamation-triangle modal-section__hint-icon" ] []
+            , text "Changing this setting will reload the page to join a new team."
+            ]
+        ]
+
+
+viewUsernameControl : LoadedModel -> Html Msg
+viewUsernameControl loadedModel =
+    div [ class "modal-section__row" ]
+        [ input
+            [ class "modal-section__input"
+            , value loadedModel.username
+            , placeholder "Your display name"
+            , onInput (\s -> CrosswordUpdated (SetUsername s))
+            , onBlur (CrosswordUpdated SaveNameChanges)
+            ]
+            []
+        , if loadedModel.nameJustSaved then
+            span [ class "modal-section__saved" ] [ text "Saved" ]
+
+          else
+            text ""
         ]
 
 
@@ -1189,9 +1218,9 @@ viewFontSizeButtons loadedModel =
 
                 buttonClass : String
                 buttonClass =
-                    "settings-section__button"
+                    "modal-section__button"
                         ++ (if isActive then
-                                " settings-section__button--active"
+                                " modal-section__button--active"
 
                             else
                                 ""
@@ -1203,7 +1232,7 @@ viewFontSizeButtons loadedModel =
                 ]
                 [ text label ]
     in
-    div [ class "settings-grid__buttons" ]
+    div [ class "modal-section__buttons" ]
         [ fontSizeButton Normal "Normal"
         , fontSizeButton Large "Large"
         , fontSizeButton ExtraLarge "Extra Large"
@@ -1222,9 +1251,9 @@ viewScrollableCluesButtons loadedModel =
 
                 buttonClass : String
                 buttonClass =
-                    "settings-section__button"
+                    "modal-section__button"
                         ++ (if isActive then
-                                " settings-section__button--active"
+                                " modal-section__button--active"
 
                             else
                                 ""
@@ -1236,7 +1265,7 @@ viewScrollableCluesButtons loadedModel =
                 ]
                 [ text label ]
     in
-    div [ class "settings-grid__buttons" ]
+    div [ class "modal-section__buttons" ]
         [ scrollableButton True "On"
         , scrollableButton False "Off"
         ]
