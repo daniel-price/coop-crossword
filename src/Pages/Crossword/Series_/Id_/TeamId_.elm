@@ -1089,7 +1089,13 @@ viewModalSection : String -> Html Msg -> Html Msg
 viewModalSection label content =
     div
         [ class "modal-section"
-        , class (if label == "" then "modal-section--action" else "")
+        , class
+            (if label == "" then
+                "modal-section--action"
+
+             else
+                ""
+            )
         ]
         [ div [ class "modal-section__label" ] [ text label ]
         , div [ class "modal-section__content" ] [ content ]
